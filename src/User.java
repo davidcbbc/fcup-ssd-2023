@@ -2,9 +2,9 @@ public class User {
     private String address;
     private int balance;
 
-    public User(String address) {
+    public User(String address, int balance) {
         this.address = address;
-        this.balance = 0;
+        this.balance = balance;
     }
 
     public int getBalance() {

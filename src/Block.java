@@ -1,3 +1,5 @@
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class Block {
@@ -11,37 +13,80 @@ public class Block {
         this.transactions = transactions;
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
+        this.nonce = 0;
         this.hash = calculateHash();
     }
 
-    public String getHash() {
-        return this.hash;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
-    public String calculateHash() {
-        return StringUtil.applySha256(
-                this.previousBlockHash +
-                        Long.toString(this.timestamp) +
-                        Integer.toString(this.nonce) +
-                        this.transactions.toString()
-        );
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public String getPreviousBlockHash() {
         return previousBlockHash;
     }
-    public void mineBlock(int difficulty) {
-        String target = StringUtil.getDifficultyString(difficulty);
-        while (!this.hash.substring(0, difficulty).equals(target)) {
-            this.nonce++;
-            this.hash = calculateHash();
+
+    public String getHash() {
+        return hash;
+    }
+
+    public int getNonce() {
+        return nonce;
+    }
+
+    public void printBlock() {
+
+        System.out.println("INICIO_Block: " + this.toString());
+        System.out.println("Block:Timestamp: " + this.timestamp);
+        System.out.println("Block:PreviousBlockHash " + this.previousBlockHash);
+        System.out.println("Block:Hash " + this.hash);
+        System.out.println("Block:Transactions: ");
+        for(Transaction transaction : this.transactions)
+        {
+            transaction.printTransaction();
         }
-        System.out.println("Block mined! : " + this.hash);
+        System.out.println("Block:FIM_Transactions: ");
+        System.out.println("FIM_Block: " + this.toString());
+    }
+
+    public void mineBlock(int difficulty) {
+        String target = new String(new char[difficulty]).replace('\0', '0');
+        while (!hash.substring(0, difficulty).equals(target)) {
+            nonce++;
+            hash = calculateHash();
+        }
+        System.out.println("Block mined! Nonce value: " + nonce);
+    }
+
+    public String calculateHash() {
+        String data = previousBlockHash + Long.toString(timestamp) + Integer.toString(nonce) + transactionsToString();
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(data.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isValidBlock(String previousBlockHash) {
-        return this.previousBlockHash.equals(previousBlockHash) &&
-                this.hash.equals(calculateHash());
+        return this.previousBlockHash.equals(previousBlockHash) && hash.equals(calculateHash());
+    }
+
+    private String transactionsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (Transaction tx : transactions) {
+            sb.append(tx.getHash());
+        }
+        return sb.toString();
     }
 }
-

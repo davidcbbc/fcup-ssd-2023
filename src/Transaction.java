@@ -1,22 +1,49 @@
 import java.security.MessageDigest;
 
 public class Transaction {
-    private String sender;
-    private String recipient;
+    private User sender;
+    private User recipient;
     private int amount;
     private String hash;
 
-    public Transaction(String sender, String recipient, int amount) {
+    public Transaction(User sender, User recipient, int amount) {
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.hash = calculateHash();
     }
 
+    public void printTransaction() {
+
+        System.out.println("INICIO_Transaction: " + this.toString());
+        System.out.println("Transaction:Sender: " + this.sender);
+        System.out.println("Transaction:Recipient: " + this.recipient);
+        System.out.println("Transaction:Amount " + this.amount);
+        System.out.println("Transaction:Hash " + this.hash);
+        System.out.println("FIM_Transaction: " + this.toString());
+
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
     public String calculateHash() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String data = this.sender + this.recipient + this.amount;
+            String data = this.sender.getAddress() + this.recipient.getAddress() + this.amount;
             byte[] hash = digest.digest(data.getBytes("UTF-8"));
             StringBuffer hexString = new StringBuffer();
 
@@ -28,10 +55,20 @@ public class Transaction {
                 hexString.append(hex);
             }
 
+            System.out.println("Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
             return hexString.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public boolean isValid() {
+        return !sender.getAddress().equals("") && !recipient.getAddress().equals("") && amount > 0;
+    }
+
+    public void execute() {
+        sender.subtractBalance(amount);
+        recipient.addBalance(amount);
     }
 }
 

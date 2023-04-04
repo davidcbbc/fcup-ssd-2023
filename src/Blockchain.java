@@ -47,6 +47,7 @@ public class Blockchain {
         this.currentTransactions.add(transaction);
     }
 
+    /*
     public Block mineBlock(User miner) {
         List<Transaction> transactions = new ArrayList<Transaction>(this.currentTransactions);
         //transactions.add(Transaction.rewardTransaction(miner.getAddress()));
@@ -54,6 +55,16 @@ public class Blockchain {
         block.mineBlock(this.difficulty);
         this.chain.add(block);
         this.currentTransactions = new ArrayList<Transaction>();
+        return block;
+    }
+
+    */
+    public Block mineBlock(List<Transaction> pendingTransactions, User miner) {
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.addAll(pendingTransactions); //Adicionar ao current_transaction? PEDRO
+        //transactions.add(Transaction.rewardTransaction(miner.getAddress()));
+        Block block = new Block(transactions, 0, this.getLastBlock().getHash());
+        block.mineBlock(this.difficulty);
         return block;
     }
 
@@ -125,7 +136,7 @@ public class Blockchain {
         //if (block.isValidBlock(block.getPreviousBlockHash()) && block.getPreviousBlockHash().equals(this.getLastBlock().getHash())) {
         if (isValidBlock(this.getLastBlock().getHash(), block)) {
             this.chain.add(block);
-            this.currentTransactions = new ArrayList<Transaction>();
+            this.currentTransactions.addAll(block.getTransactions());
         }
     }
 

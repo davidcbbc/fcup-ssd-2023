@@ -109,20 +109,31 @@ public class Main {
 
         // broadcast the transactions to the network
         node1.broadcastTransaction(tx1);
-        node1.broadcastTransaction(tx2);
+      // 1  node1.broadcastTransaction(tx2);
+
+        node3.mineBlock(alice);
+
         node1.broadcastTransaction(tx3);
 
         // mine some blocks containing the transactions
         node1.mineBlock(alice);
-        node2.mineBlock(bob);
+
+        // 1
+        //node1.broadcastTransaction(tx2);
+        //node2.mineBlock(bob);
 
         // print the current state of the blockchain for each node
         System.out.println("Node 1 blockchain:");
         node1.getBlockchain().printBlockchain();
+
+        // 1
+        node1.broadcastTransaction(tx2);
+        node2.mineBlock(bob);
+
         System.out.println("Node 2 blockchain:");
         node2.getBlockchain().printBlockchain();
-        System.out.println("Node 3 blockchain:");
-        node3.getBlockchain().printBlockchain();
+        //System.out.println("Node 3 blockchain:");
+        //node3.getBlockchain().printBlockchain();
 
         // print the current state of each User
         System.out.println("alice balance: " + alice.getBalance());

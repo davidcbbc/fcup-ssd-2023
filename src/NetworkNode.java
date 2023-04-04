@@ -5,10 +5,12 @@ public class NetworkNode {
 
     private Blockchain blockchain;
     private List<NetworkNode> peers;
+    private List<Transaction> pendingTransactions;
 
     public NetworkNode(Blockchain blockchain) {
         this.blockchain = blockchain;
         this.peers = new ArrayList<>();
+        this.pendingTransactions = new ArrayList<>();
         //this.peers.add(this); // add self as peer
         this.addPeer(this);
     }
@@ -45,17 +47,19 @@ public class NetworkNode {
 
     public void receiveTransaction(Transaction transaction) {
        // previous blockchain.addTransaction(transaction);
-        if (transaction.isValid() && (!blockchain.getTransactions().contains(transaction))){
+       /* if (transaction.isValid() && (!blockchain.getTransactions().contains(transaction))){
             blockchain.addTransaction(transaction);
-        }
+        } */
+        pendingTransactions.add(transaction);
     }
 
     public void broadcastTransaction(Transaction transaction) {
-        blockchain.addTransaction(transaction);
+        pendingTransactions.add(transaction);
+        //blockchain.addTransaction(transaction);
         for (NetworkNode node : peers) {
             node.receiveTransaction(transaction);
         }
-        // execute the transaction
+        // execute the transaction PEDRO, deve ser aqui o execute? ou só qd for adicionado ao blockchain?
         transaction.execute();
     }
 
@@ -64,6 +68,7 @@ public class NetworkNode {
         for (NetworkNode node : peers) {
             node.receiveBlock(block);
         }
+        pendingTransactions.clear();
     }
 
 
@@ -75,9 +80,15 @@ public class NetworkNode {
 
         if (blockchain.isValidBlock(blockchain.getLastBlock().getHash() ,block)) {
             blockchain.addBlock(block);
+            pendingTransactions.clear();
+        }
+        else {
+            //if block is already in blockchain, remove the pendingTransactions
+            if (blockchain.getChain().contains(block)) {
+                pendingTransactions.clear();
+            }
         }
     }
-
 
 /*
     public void receiveBlock(Block block) {
@@ -99,8 +110,12 @@ public class NetworkNode {
     }
 
     public void mineBlock(User miner) {
-        blockchain.mineBlock(miner);
-        broadcastBlock(blockchain.getLastBlock());
+       // blockchain.mineBlock(miner);
+        Block block = blockchain.mineBlock(pendingTransactions, miner);
+        if (block != null) {
+            broadcastBlock(block);
+
+        }
     }
 
     public void broadcastRequestBlockchain() {

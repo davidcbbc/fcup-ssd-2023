@@ -1,13 +1,13 @@
 public class User {
     private String address;
-    private int balance;
+    private double balance;
 
-    public User(String address, int balance) {
+    public User(String address, double balance) {
         this.address = address;
         this.balance = balance;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return this.balance;
     }
 
@@ -15,11 +15,11 @@ public class User {
         return this.address;
     }
 
-    public void addBalance(int amount) {
+    public void addBalance(double amount) {
         this.balance += amount;
     }
 
-    public void subtractBalance(int amount) {
+    public void subtractBalance(double amount) {
         this.balance -= amount;
     }
 }

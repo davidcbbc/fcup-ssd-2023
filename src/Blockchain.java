@@ -1,22 +1,31 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Blockchain {
     private List<Block> chain;
     private int difficulty;
     private List<Transaction> currentTransactions;
+    private boolean useProofOfStake; // Added field for proof of stake
+    private static  double minStakerequired = 1000; // Example: Minimum required stake to create a block is 1000
+    private Map<User, Double> validators; // Map to store validator addresses and their stakes
 
-    public Blockchain(int difficulty) {
+    public Blockchain(int difficulty, boolean useProofOfStake) {
         this.chain = new ArrayList<Block>();
         this.difficulty = difficulty;
         this.currentTransactions = new ArrayList<Transaction>();
         this.chain.add(createGenesisBlock());
+        this.useProofOfStake = useProofOfStake; // Initialize useProofOfStake field
+        if (useProofOfStake) {
+            validators = new HashMap<>();
+        }
     }
 
     private Block createGenesisBlock() {
-        return new Block(new ArrayList<Transaction>(), 0,"0");
+        return new Block(new ArrayList<Transaction>(),  new Date().getTime(),"0");
     }
-
 
     public void printBlockchain() {
 
@@ -47,18 +56,8 @@ public class Blockchain {
         this.currentTransactions.add(transaction);
     }
 
-    /*
-    public Block mineBlock(User miner) {
-        List<Transaction> transactions = new ArrayList<Transaction>(this.currentTransactions);
-        //transactions.add(Transaction.rewardTransaction(miner.getAddress()));
-        Block block = new Block(transactions, 0,this.getLastBlock().getHash());
-        block.mineBlock(this.difficulty);
-        this.chain.add(block);
-        this.currentTransactions = new ArrayList<Transaction>();
-        return block;
-    }
 
-    */
+/*
     public Block mineBlock(List<Transaction> pendingTransactions, User miner) {
         List<Transaction> transactions = new ArrayList<>();
         transactions.addAll(pendingTransactions); //Adicionar ao current_transaction? PEDRO
@@ -66,6 +65,38 @@ public class Blockchain {
         Block block = new Block(transactions, 0, this.getLastBlock().getHash());
         block.mineBlock(this.difficulty);
         return block;
+    }
+*/
+    // With Proof of Stake
+    public Block mineBlock(List<Transaction> pendingTransactions, User miner) {
+
+        if (useProofOfStake && this.validators.containsKey(miner) && miner.getBalance() >= minStakerequired) {
+            List<Transaction> transactions = new ArrayList<>();
+            transactions.addAll(pendingTransactions);
+            // Add reward transaction for User
+            transactions.add(Transaction.rewardTransaction(miner));
+            miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
+            Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+            block.mineBlock(this.difficulty);
+            return block;
+        } else if (!useProofOfStake) {
+            // If not using PoS, mine the block as usual
+            List<Transaction> transactions = new ArrayList<>();
+            transactions.addAll(pendingTransactions);
+            transactions.add(Transaction.rewardTransaction(miner));
+            Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+            block.mineBlock(this.difficulty);
+            return block;
+        }
+        //else if validator does not meet PoS requirements, return null
+        System.out.println("User does not meet PoS requirements!");
+        return null;
+
+      /*
+
+        Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+        block.mineBlock(this.difficulty);
+        return block; */
     }
 
     public boolean isValidBlock(String previousBlockHash, Block block) {
@@ -82,10 +113,6 @@ public class Blockchain {
             if (!currentBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
                 return false;
             }
-/* substituido pelo de baixo
-            if (!currentBlock.isValidBlock(currentBlock.getPreviousBlockHash())) {
-                return false;
-            } */
 
             if (!isValidBlock(previousBlock.getHash(), currentBlock)) {
                 return false;
@@ -115,12 +142,7 @@ public class Blockchain {
             if (!currentBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
                 return false;
             }
-/* substituido pelo de baixo
 
-            if (!currentBlock.isValidBlock(currentBlock.getPreviousBlockHash())) {
-                return false;
-            }
-  */
             if (!isValidBlock(previousBlock.getHash(), currentBlock)) {
                 return false;
             }
@@ -132,7 +154,7 @@ public class Blockchain {
     }
 
     public void addBlock(Block block) {
-        // csubstituido pelo de baixo
+        // substituido pelo de baixo
         //if (block.isValidBlock(block.getPreviousBlockHash()) && block.getPreviousBlockHash().equals(this.getLastBlock().getHash())) {
         if (isValidBlock(this.getLastBlock().getHash(), block)) {
             this.chain.add(block);
@@ -151,4 +173,49 @@ public class Blockchain {
     public List<Transaction> getTransactions() {
         return this.currentTransactions;
     }
+    public boolean validateProofOfStake(String validatorAddress) {
+        // Example implementation of PoS validation with stake and ownership checks
+
+        // Check if the given validator address is in the list of validators
+        if (!validators.containsKey(validatorAddress)) {
+            return false;
+        }
+
+        // Check if the validator owns enough stake to create a new block
+        // You can modify this check based on your specific stake requirements
+
+        if (validators.get(validatorAddress) < this.minStakerequired) {
+            return false;
+        }
+
+        // Additional checks for ownership of cryptocurrency can be added here
+        // For example, you could check if the validator has a certain amount of cryptocurrency in their wallet
+
+        return true;
+    }
+
+    public void addValidator(User validator) {
+        // Add a validator with the given address and stake to the list of validators
+        validators.put(validator, validator.getBalance());
+    }
+
+    public void removeValidator(User validator) {
+        // Add a validator with the given address and stake to the list of validators
+        validators.remove(validator);
+    }
+
+    public void checkAddValidator(User validator) {
+        if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
+            addValidator(validator);
+    }
+
+    public void checkRemoveValidator(User validator) {
+        if (validator.getBalance() >= minStakerequired)
+            removeValidator(validator);
+    }
+
+    public Map<User, Double> getValidators() {
+        return this.validators;
+    }
+
 }

@@ -8,6 +8,7 @@ public class Block {
     private String previousBlockHash;
     private String hash;
     private int nonce;
+    private User validator;
 
     public Block(List<Transaction> transactions, long timestamp, String previousBlockHash) {
         this.transactions = transactions;
@@ -16,6 +17,16 @@ public class Block {
         this.nonce = 0;
         this.hash = calculateHash();
     }
+
+    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, User validator) {
+        this.transactions = transactions;
+        this.timestamp = timestamp;
+        this.previousBlockHash = previousBlockHash;
+        this.nonce = 0;
+        this.hash = calculateHash();
+        this.validator = validator;
+    }
+
 
     public List<Transaction> getTransactions() {
         return transactions;
@@ -59,6 +70,11 @@ public class Block {
             hash = calculateHash();
         }
         System.out.println("Block mined! Nonce value: " + nonce);
+        for (Transaction transaction : this.transactions) {
+            transaction.execute();
+            System.out.println("Transaction: " + transaction.toString() + " executed!");
+            System.out.println("Transaction Amount: " + transaction.getAmount());
+        }
     }
 
     public String calculateHash() {

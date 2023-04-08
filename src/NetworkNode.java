@@ -6,6 +6,7 @@ public class NetworkNode {
     private Blockchain blockchain;
     private List<NetworkNode> peers;
     private List<Transaction> pendingTransactions;
+    //private double stake;
 
     public NetworkNode(Blockchain blockchain) {
         this.blockchain = blockchain;
@@ -14,6 +15,17 @@ public class NetworkNode {
         //this.peers.add(this); // add self as peer
         this.addPeer(this);
     }
+
+
+    /*
+    public NetworkNode(Blockchain blockchain, double stake) {
+        this.blockchain = blockchain;
+        this.peers = new ArrayList<>();
+        this.pendingTransactions = new ArrayList<>();
+        //this.peers.add(this); // add self as peer
+        this.addPeer(this);
+        this.stake = stake;
+    } */
 
     public void addPeer(NetworkNode node) {
         /* if (!peers.contains(node)) {
@@ -46,7 +58,6 @@ public class NetworkNode {
     }
 
     public void receiveTransaction(Transaction transaction) {
-       // previous blockchain.addTransaction(transaction);
        /* if (transaction.isValid() && (!blockchain.getTransactions().contains(transaction))){
             blockchain.addTransaction(transaction);
         } */
@@ -55,12 +66,11 @@ public class NetworkNode {
 
     public void broadcastTransaction(Transaction transaction) {
         pendingTransactions.add(transaction);
-        //blockchain.addTransaction(transaction);
         for (NetworkNode node : peers) {
             node.receiveTransaction(transaction);
         }
         // execute the transaction PEDRO, deve ser aqui o execute? ou só qd for adicionado ao blockchain?
-        transaction.execute();
+        //transaction.execute();
     }
 
     public void broadcastBlock(Block block) {
@@ -90,16 +100,6 @@ public class NetworkNode {
         }
     }
 
-/*
-    public void receiveBlock(Block block) {
-        if (blockchain.isValidBlock(block)) {
-            blockchain.addBlock(block);
-        } else if (blockchain.isChainLengthValid(blockchain.getBlocks())) {
-            // if the received block is part of a longer chain, request the longer chain from peers
-            broadcastRequestBlockchain();
-        }
-    } */
-
     public void addNode(NetworkNode node) {
         for (NetworkNode peer : peers) {
             if (peer != node) {
@@ -114,31 +114,14 @@ public class NetworkNode {
         Block block = blockchain.mineBlock(pendingTransactions, miner);
         if (block != null) {
             broadcastBlock(block);
-
-        }
-    }
-
-    public void broadcastRequestBlockchain() {
-        for (NetworkNode peer : peers) {
-            peer.receiveRequestBlockchain();
-        }
-    }
-
-    public void receiveRequestBlockchain() {
-        broadcastBlockchain();
-    }
-
-    public void broadcastBlockchain() {
-        for (NetworkNode peer : peers) {
-            if (peer != this) {
-                peer.receiveBlockchain(blockchain.getChain());
+            // check if Users can be added to Validators list
+            for (Transaction transaction : block.getTransactions()) {
+                blockchain.checkAddValidator(transaction.getRecipient());
+                blockchain.checkRemoveValidator(transaction.getSender());
             }
+
+
         }
     }
 
-    public void receiveBlockchain(List<Block> newChain) {
-        if (blockchain.isChainValid(newChain)) {
-            blockchain.replaceChain(newChain);
-        }
-    }
 }

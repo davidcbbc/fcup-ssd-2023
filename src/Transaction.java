@@ -3,10 +3,13 @@ import java.security.MessageDigest;
 public class Transaction {
     private User sender;
     private User recipient;
-    private int amount;
+    private double amount;
     private String hash;
+    // Add object
+    // Add previous bid
+    private static double rewardAmount = 10;
 
-    public Transaction(User sender, User recipient, int amount) {
+    public Transaction(User sender, User recipient, double amount) {
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
@@ -24,6 +27,12 @@ public class Transaction {
 
     }
 
+    // Generate a reward transaction for the given recipient
+    public static Transaction rewardTransaction(User recipient) {
+        User sender = new User("Reward", 999999999); // Use a special sender for reward transaction
+        return new Transaction(sender, recipient, rewardAmount);
+    }
+
     public User getSender() {
         return sender;
     }
@@ -32,7 +41,7 @@ public class Transaction {
         return recipient;
     }
 
-    public int getAmount() {
+    public double getAmount() {
         return amount;
     }
 

@@ -205,12 +205,14 @@ public class Blockchain {
     }
 
     public void checkAddValidator(User validator) {
-        if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
+        // Always add validator to update the balance
+        //if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
+        if ((validator.getBalance() >= minStakerequired))
             addValidator(validator);
     }
 
     public void checkRemoveValidator(User validator) {
-        if (validator.getBalance() >= minStakerequired)
+        if (validator.getBalance() < minStakerequired)
             removeValidator(validator);
     }
 

@@ -4,10 +4,11 @@ import java.util.Map;
 
 public class Main {
 
-
     public static void main(String[] args) {
+
+        boolean useProofOfStake = true;
         // create a blockchain with a genesis block
-        Blockchain blockchain = new Blockchain(3, true);
+        Blockchain blockchain = new Blockchain(3, useProofOfStake);
        // Block genesisBlock = new Block(new ArrayList<>(), 0,"0");
         //blockchain.addBlock(genesisBlock);
 
@@ -25,7 +26,7 @@ public class Main {
         node3.addPeer(node2);
 
         // create some users and add transactions
-        User alice = new User("Alice",1990);
+        User alice = new User("Alice",2990);
         blockchain.addValidator(alice);
         User bob = new User("Bob",10);
         User charlie = new User("Charlie",10);
@@ -42,7 +43,7 @@ public class Main {
         node1.broadcastTransaction(tx3);
 
         // mine some blocks containing the transactions
-        node1.mineBlock(alice);
+        node1.mineBlock(bob);
 
         // 1
         //node1.broadcastTransaction(tx2);

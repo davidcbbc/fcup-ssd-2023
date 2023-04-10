@@ -9,7 +9,7 @@ public class Main {
         boolean useProofOfStake = true;
         // create a blockchain with a genesis block
         Blockchain blockchain = new Blockchain(3, useProofOfStake);
-       // Blockchain.Blockchain.Block genesisBlock = new Blockchain.Blockchain.Block(new ArrayList<>(), 0,"0");
+       // main.Blockchain.main.Blockchain.Block genesisBlock = new main.Blockchain.main.Blockchain.Block(new ArrayList<>(), 0,"0");
         //blockchain.addBlock(genesisBlock);
 
         // create three network nodes with the blockchain
@@ -62,7 +62,7 @@ public class Main {
         //System.out.println("Node 3 blockchain:");
         //node3.getBlockchain().printBlockchain();
 
-        // print the current state of each Blockchain.User
+        // print the current state of each main.Blockchain.User
         System.out.println("alice balance: " + alice.getBalance());
         System.out.println("bob balance: " + bob.getBalance());
         System.out.println("charlie balance: " + charlie.getBalance());

@@ -21,10 +21,10 @@ public class Transaction {
     public void printTransaction() {
 
         System.out.println("INICIO_Transaction: " + this.toString());
-        System.out.println("Blockchain.Transaction:Sender: " + this.sender);
-        System.out.println("Blockchain.Transaction:Recipient: " + this.recipient);
-        System.out.println("Blockchain.Transaction:Amount " + this.amount);
-        System.out.println("Blockchain.Transaction:Hash " + this.hash);
+        System.out.println("main.Blockchain.Transaction:Sender: " + this.sender);
+        System.out.println("main.Blockchain.Transaction:Recipient: " + this.recipient);
+        System.out.println("main.Blockchain.Transaction:Amount " + this.amount);
+        System.out.println("main.Blockchain.Transaction:Hash " + this.hash);
         System.out.println("FIM_Transaction: " + this.toString());
 
     }
@@ -66,7 +66,7 @@ public class Transaction {
                 hexString.append(hex);
             }
 
-            System.out.println("Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
+            System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
             return hexString.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);

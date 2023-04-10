@@ -20,7 +20,7 @@ public class NetworkNode {
 
 
     /*
-    public Blockchain.NetworkNode(Blockchain.Blockchain blockchain, double stake) {
+    public main.Blockchain.NetworkNode(main.Blockchain.main.Blockchain blockchain, double stake) {
         this.blockchain = blockchain;
         this.peers = new ArrayList<>();
         this.pendingTransactions = new ArrayList<>();

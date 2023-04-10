@@ -117,10 +117,12 @@ public class NetworkNode {
             // check if Users can be added to Validators list
             for (Transaction transaction : block.getTransactions()) {
                 blockchain.checkAddValidator(transaction.getRecipient());
-                blockchain.checkRemoveValidator(transaction.getSender());
+                if (!transaction.getSender().getAddress().equals("Reward")) {
+                    blockchain.checkAddValidator(transaction.getSender());
+                    blockchain.checkRemoveValidator(transaction.getSender());
+
+                }
             }
-
-
         }
     }
 

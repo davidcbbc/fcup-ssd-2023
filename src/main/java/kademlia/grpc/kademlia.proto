@@ -1,0 +1,56 @@
+syntax="proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+
+//Many messages could be truncated into one (for example validation ones)
+//but they are kept as different in case changes are made that cause a divergence
+service Kademlia{
+  rpc Ping(pingMessage) returns (pingAnswer);
+  rpc Store(storeMessage) returns (storeAnswer);
+  rpc FindNode(findNodeMessage) returns (findNodeAnswer);
+  rpc FindValue(findValueMessage) returns (findValueAnswer);
+}
+
+
+message pingMessage{
+  Node node = 1;
+}
+
+message storeMessage{
+}
+
+message findNodeMessage{
+  Node node =1;
+
+}
+
+message findValueMessage{
+
+}
+
+message pingAnswer{
+  Node node =1;
+}
+
+message storeAnswer{
+  Node node =1;
+}
+
+message findNodeAnswer{
+  repeated Node rcvd=1;
+  string bhash=2;
+  int32 size=3;
+}
+
+message findValueAnswer{
+  Node node =1;
+}
+
+
+message Node{
+  string ip=1;
+  bytes id=2;
+  int32 port=3;
+}

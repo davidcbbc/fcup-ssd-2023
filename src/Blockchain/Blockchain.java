@@ -1,3 +1,5 @@
+package Blockchain;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -30,23 +32,23 @@ public class Blockchain {
     public void printBlockchain() {
 
         System.out.println("INICIO_Blockchain: " + this.toString());
-        System.out.println("Blockchain:Difficulty: " + this.difficulty);
-        System.out.println("Blockchain:Blocks_INICIO ");
+        System.out.println("Blockchain.Blockchain:Difficulty: " + this.difficulty);
+        System.out.println("Blockchain.Blockchain:Blocks_INICIO ");
         int count = 0;
         for(Block block : this.chain)
         {
             block.printBlock();
             count++;
         }
-        System.out.println("Blockchain:Blocks_FIM: " + count + " BLOCKS");
-        System.out.println("Blockchain:Transactions_INICIO ");
+        System.out.println("Blockchain.Blockchain:Blocks_FIM: " + count + " BLOCKS");
+        System.out.println("Blockchain.Blockchain:Transactions_INICIO ");
         count = 0;
         for(Transaction transaction : this.currentTransactions)
         {
             transaction.printTransaction();
             count++;
         }
-        System.out.println("Blockchain:Transactions_FIM: " + count + " Transactions");
+        System.out.println("Blockchain.Blockchain:Transactions_FIM: " + count + " Transactions");
 
         System.out.println("FIM_Blockchain: " + this.toString());
     }
@@ -58,11 +60,11 @@ public class Blockchain {
 
 
 /*
-    public Block mineBlock(List<Transaction> pendingTransactions, User miner) {
-        List<Transaction> transactions = new ArrayList<>();
+    public Blockchain.Blockchain.Block mineBlock(List<Blockchain.Transaction> pendingTransactions, Blockchain.User miner) {
+        List<Blockchain.Transaction> transactions = new ArrayList<>();
         transactions.addAll(pendingTransactions); //Adicionar ao current_transaction? PEDRO
-        //transactions.add(Transaction.rewardTransaction(miner.getAddress()));
-        Block block = new Block(transactions, 0, this.getLastBlock().getHash());
+        //transactions.add(Blockchain.Transaction.rewardTransaction(miner.getAddress()));
+        Blockchain.Blockchain.Block block = new Blockchain.Blockchain.Block(transactions, 0, this.getLastBlock().getHash());
         block.mineBlock(this.difficulty);
         return block;
     }
@@ -73,7 +75,7 @@ public class Blockchain {
         if (useProofOfStake && this.validators.containsKey(miner) && miner.getBalance() >= minStakerequired) {
             List<Transaction> transactions = new ArrayList<>();
             transactions.addAll(pendingTransactions);
-            // Add reward transaction for User
+            // Add reward transaction for Blockchain.User
             transactions.add(Transaction.rewardTransaction(miner));
             miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
@@ -89,12 +91,12 @@ public class Blockchain {
             return block;
         }
         //else if validator does not meet PoS requirements, return null
-        System.out.println("User does not meet PoS requirements!");
+        System.out.println("Blockchain.User does not meet PoS requirements!");
         return null;
 
       /*
 
-        Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+        Blockchain.Blockchain.Block block = new Blockchain.Blockchain.Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
         block.mineBlock(this.difficulty);
         return block; */
     }

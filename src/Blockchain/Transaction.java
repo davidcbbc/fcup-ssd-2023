@@ -1,3 +1,5 @@
+package Blockchain;
+
 import java.security.MessageDigest;
 
 public class Transaction {
@@ -19,10 +21,10 @@ public class Transaction {
     public void printTransaction() {
 
         System.out.println("INICIO_Transaction: " + this.toString());
-        System.out.println("Transaction:Sender: " + this.sender);
-        System.out.println("Transaction:Recipient: " + this.recipient);
-        System.out.println("Transaction:Amount " + this.amount);
-        System.out.println("Transaction:Hash " + this.hash);
+        System.out.println("Blockchain.Transaction:Sender: " + this.sender);
+        System.out.println("Blockchain.Transaction:Recipient: " + this.recipient);
+        System.out.println("Blockchain.Transaction:Amount " + this.amount);
+        System.out.println("Blockchain.Transaction:Hash " + this.hash);
         System.out.println("FIM_Transaction: " + this.toString());
 
     }
@@ -64,7 +66,7 @@ public class Transaction {
                 hexString.append(hex);
             }
 
-            System.out.println("Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
+            System.out.println("Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
             return hexString.toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);

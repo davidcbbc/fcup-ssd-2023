@@ -1,3 +1,5 @@
+package Blockchain;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -51,15 +53,15 @@ public class Block {
     public void printBlock() {
 
         System.out.println("INICIO_Block: " + this.toString());
-        System.out.println("Block:Timestamp: " + this.timestamp);
-        System.out.println("Block:PreviousBlockHash " + this.previousBlockHash);
-        System.out.println("Block:Hash " + this.hash);
-        System.out.println("Block:Transactions: ");
+        System.out.println("Blockchain.Blockchain.Block:Timestamp: " + this.timestamp);
+        System.out.println("Blockchain.Blockchain.Block:PreviousBlockHash " + this.previousBlockHash);
+        System.out.println("Blockchain.Blockchain.Block:Hash " + this.hash);
+        System.out.println("Blockchain.Blockchain.Block:Transactions: ");
         for(Transaction transaction : this.transactions)
         {
             transaction.printTransaction();
         }
-        System.out.println("Block:FIM_Transactions: ");
+        System.out.println("Blockchain.Blockchain.Block:FIM_Transactions: ");
         System.out.println("FIM_Block: " + this.toString());
     }
 
@@ -69,11 +71,11 @@ public class Block {
             nonce++;
             hash = calculateHash();
         }
-        System.out.println("Block mined! Nonce value: " + nonce);
+        System.out.println("Blockchain.Blockchain.Block mined! Nonce value: " + nonce);
         for (Transaction transaction : this.transactions) {
             transaction.execute();
-            System.out.println("Transaction: " + transaction.toString() + " executed!");
-            System.out.println("Transaction Amount: " + transaction.getAmount());
+            System.out.println("Blockchain.Transaction: " + transaction.toString() + " executed!");
+            System.out.println("Blockchain.Transaction Amount: " + transaction.getAmount());
         }
     }
 

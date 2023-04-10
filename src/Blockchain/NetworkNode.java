@@ -1,3 +1,5 @@
+package Blockchain;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class NetworkNode {
 
 
     /*
-    public NetworkNode(Blockchain blockchain, double stake) {
+    public Blockchain.NetworkNode(Blockchain.Blockchain blockchain, double stake) {
         this.blockchain = blockchain;
         this.peers = new ArrayList<>();
         this.pendingTransactions = new ArrayList<>();

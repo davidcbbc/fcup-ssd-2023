@@ -1,3 +1,5 @@
+package Blockchain;
+
 public class User {
     private String address;
     private double balance;

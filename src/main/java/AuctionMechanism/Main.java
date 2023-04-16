@@ -1,11 +1,93 @@
 package AuctionMechanism;
 
+import java.awt.*;
 import java.util.Map;
+import java.util.Scanner;
+import java.security.*;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        Scanner in = new Scanner(System.in);
+
+        int keyChoice = -1;
+        System.out.println("1 - Import Key Pair\n2 - Create new Key Pair\n");
+        System.out.println("Please Choose an option between 1 and 2");
+        keyChoice = in.nextInt();
+        while(keyChoice > 2 || keyChoice < 1){
+            System.out.println("Please Choose an option between 1 and 5");
+            keyChoice = in.nextInt();
+        }
+
+        switch (keyChoice){
+            case 1 :
+                KeyPairGenerator keyGen = null;
+                try {
+                    keyGen = KeyPairGenerator.getInstance("RSA");
+                    keyGen.initialize(2048);
+                    KeyPair keyPair = keyGen.generateKeyPair();
+                    // Get the public and private keys
+                    PublicKey publicKey = keyPair.getPublic();
+                    PrivateKey privateKey = keyPair.getPrivate();
+                    // Print the keys to the console
+                    System.out.println("Public Key: " + publicKey);
+                    System.out.println("Private Key: " + privateKey);
+                } catch (NoSuchAlgorithmException e) {
+                    System.out.println("Error generating key pair ");
+                }
+                break;
+            case 2 :
+
+                break;
+            default : break;
+        }
+
+
+
+        // IMPORT OR CREATE PAIR OF PUBLIC AND PRIVATE KEY FOR AUTHENTICATION
+        int choice = -1;
+        while (choice != 5){
+
+
+            System.out.println("1 - Create Auction\n2 - See Open Auctions\n3 - Make a Bid\n4 - See Winning Bids\n5 - Exit\n");
+            System.out.println("Please Choose an option between 1 and 5");
+            choice = in.nextInt();
+            while (choice < 1 || choice > 5){
+                System.out.println("Please Choose an option between 1 and 5");
+                choice = in.nextInt();
+            }
+
+            switch (choice){
+                case 1 :
+                    // Call Create Auction Function
+                    break;
+                case 2 :
+                    // Call See Open Auction Function
+                    break;
+                case 3 :
+                    // Call Make Bid Function
+                    break;
+                case 4 : 
+                    // Call See Winning Bids Function
+                    break;
+                case 5 :
+                    System.out.println("Exiting...");
+                    break;
+                default :
+                    System.out.println("Choice default");
+                    break;
+
+            }
+        }
+
+
+
+
+
+
+
+        /*
         boolean useProofOfStake = true;
         // create a blockchain with a genesis block
         Blockchain blockchain = new Blockchain(3, useProofOfStake);
@@ -72,6 +154,6 @@ public class Main {
             System.out.println("Validator: " + validator.getKey().getAddress() + " : " + validator.getValue());
 
         }
+    */
     }
-
 }

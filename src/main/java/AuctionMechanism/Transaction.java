@@ -1,8 +1,134 @@
 package AuctionMechanism;
 
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 
 public class Transaction {
+
+    public enum TransactionStatus {
+        REGISTERED,
+        BID_PLACED,
+        WINNER_DECLARED
+    }
+
+    private String sellerPublicKey;
+    private String buyerPublicKey;
+    private String auctionedItem;
+    private int minimumBid;
+    private int currentBid;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private TransactionStatus status;
+    private String hash;
+
+    public Transaction(String sellerPublicKey, int minimumBid, LocalDateTime startTime, LocalDateTime endTime) {
+        this.sellerPublicKey = sellerPublicKey;
+        this.buyerPublicKey = null;
+        this.auctionedItem = null;
+        this.minimumBid = minimumBid;
+        this.currentBid = 0;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = TransactionStatus.REGISTERED;
+        this.hash = calculateHash();
+    }
+
+    public String getSellerPublicKey() {
+        return sellerPublicKey;
+    }
+
+    public void setSellerPublicKey(String sellerPublicKey) {
+        this.sellerPublicKey = sellerPublicKey;
+    }
+
+    public String getBuyerPublicKey() {
+        return buyerPublicKey;
+    }
+
+    public void setBuyerPublicKey(String buyerPublicKey) {
+        this.buyerPublicKey = buyerPublicKey;
+    }
+
+    public String getAuctionedItem() {
+        return auctionedItem;
+    }
+
+    public void setAuctionedItem(String auctionedItem) {
+        this.auctionedItem = auctionedItem;
+    }
+
+    public int getMinimumBid() {
+        return minimumBid;
+    }
+
+    public void setMinimumBid(int minimumBid) {
+        this.minimumBid = minimumBid;
+    }
+
+    public int getCurrentBid() {
+        return currentBid;
+    }
+
+    public void setCurrentBid(int currentBid) {
+        this.currentBid = currentBid;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public TransactionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public String calculateHash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String data = this.sellerPublicKey + this.buyerPublicKey + this.auctionedItem + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
+            byte[] hash = digest.digest(data.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+}
+
+/*public class Transaction {
     private User sender;
     private User recipient;
     private double amount;
@@ -81,5 +207,5 @@ public class Transaction {
         sender.subtractBalance(amount);
         recipient.addBalance(amount);
     }
-}
+}*/
 

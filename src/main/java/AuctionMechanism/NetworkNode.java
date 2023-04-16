@@ -117,14 +117,14 @@ public class NetworkNode {
         if (block != null) {
             broadcastBlock(block);
             // check if Users can be added to Validators list
-            for (Transaction transaction : block.getTransactions()) {
-                blockchain.checkAddValidator(transaction.getRecipient());
-                if (!transaction.getSender().getAddress().equals("Reward")) {
-                    blockchain.checkAddValidator(transaction.getSender());
-                    blockchain.checkRemoveValidator(transaction.getSender());
+            //for (Transaction transaction : block.getTransactions()) {
+                //blockchain.checkAddValidator(transaction.getRecipient());
+                //if (!transaction.getSender().getAddress().equals("Reward")) {
+                    //blockchain.checkAddValidator(transaction.getSender());
+                    //blockchain.checkRemoveValidator(transaction.getSender());
 
-                }
-            }
+                //}
+            //}
         }
     }
 

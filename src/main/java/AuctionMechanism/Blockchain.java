@@ -41,7 +41,7 @@ public class Blockchain {
         count = 0;
         for(Transaction transaction : this.currentTransactions)
         {
-            transaction.printTransaction();
+            //transaction.printTransaction();
             count++;
         }
         System.out.println("main.Blockchain.main.Blockchain:Transactions_FIM: " + count + " Transactions");
@@ -72,8 +72,8 @@ public class Blockchain {
             List<Transaction> transactions = new ArrayList<>();
             transactions.addAll(pendingTransactions);
             // Add reward transaction for main.Blockchain.User
-            transactions.add(Transaction.rewardTransaction(miner));
-            miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
+            //transactions.add(Transaction.rewardTransaction(miner));
+            //miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
             block.mineBlock(this.difficulty);
             return block;
@@ -81,7 +81,7 @@ public class Blockchain {
             // If not using PoS, mine the block as usual
             List<Transaction> transactions = new ArrayList<>();
             transactions.addAll(pendingTransactions);
-            transactions.add(Transaction.rewardTransaction(miner));
+            //transactions.add(Transaction.rewardTransaction(miner));
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
             block.mineBlock(this.difficulty);
             return block;

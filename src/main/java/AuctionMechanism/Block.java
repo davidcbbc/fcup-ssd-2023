@@ -59,7 +59,7 @@ public class Block {
         System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
         for(Transaction transaction : this.transactions)
         {
-            transaction.printTransaction();
+            //transaction.printTransaction();
         }
         System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
         System.out.println("FIM_Block: " + this.toString());
@@ -73,9 +73,9 @@ public class Block {
         }
         System.out.println("main.Blockchain.main.Blockchain.Block mined! Nonce value: " + nonce);
         for (Transaction transaction : this.transactions) {
-            transaction.execute();
+            //transaction.execute();
             System.out.println("main.Blockchain.Transaction: " + transaction.toString() + " executed!");
-            System.out.println("main.Blockchain.Transaction Amount: " + transaction.getAmount());
+            //System.out.println("main.Blockchain.Transaction Amount: " + transaction.getAmount());
         }
     }
 

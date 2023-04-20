@@ -1,4 +1,5 @@
 import io.grpc.ServerBuilder;
+import kademlia.grpc.PingImpl;
 
 public class Server {
 
@@ -8,7 +9,7 @@ public class Server {
         System.out.println("[+] Starting the server");
         io.grpc.Server server = ServerBuilder
                 .forPort(8080)
-                .addService(new HelloServiceImpl()).build();
+                .addService(new PingImpl()).build();
 
         try {
             server.start();

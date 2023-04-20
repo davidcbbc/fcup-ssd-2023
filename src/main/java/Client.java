@@ -1,5 +1,9 @@
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import kademlia.grpc.KademliaServiceGrpc;
+import kademlia.grpc.PingImpl;
+import kademlia.grpc.pingAnswer;
+import kademlia.grpc.pingMessage;
 
 public class Client {
 
@@ -8,14 +12,15 @@ public class Client {
                 .usePlaintext()
                 .build();
 
-        HelloServiceGrpc.HelloServiceBlockingStub stub = HelloServiceGrpc.newBlockingStub(channel);
+        KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
 
-        HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
-                .setFirstName("David")
-                .setLastName("Capella")
-                .build());
 
-        System.out.println(helloResponse.getGreeting());
+        pingAnswer answer = stub.ping(pingMessage.newBuilder()
+                .setId("1")
+                .setIp("localhost")
+                .setPort(8080).build());
+
+        System.out.println("[+] NODE PING REPLY: IP " + answer.getIp() + ":" + Integer.toString(answer.getPort()) + " -> ID " + answer.getId());
 
         channel.shutdown();
     }

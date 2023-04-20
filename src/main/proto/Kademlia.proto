@@ -1,0 +1,51 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package kademlia.grpc;
+
+
+service KademliaService {
+  rpc Ping(pingMessage) returns (pingAnswer);
+  rpc Store(storeMessage) returns (storeAnswer);
+  rpc FindNode(findNodeMessage) returns (findNodeAnswer);
+  rpc FindValue(findValueMessage) returns (findValueAnswer);
+}
+
+
+// MESSAGES
+
+message pingMessage {
+  string id = 1;
+  string ip =2;
+  int32 port = 3;
+}
+
+message pingAnswer {
+  string id = 1;
+  string ip =2;
+  int32 port =3;
+  string timestamp =4;
+}
+
+message storeMessage {
+
+}
+
+message storeAnswer{
+
+}
+
+message findNodeMessage {
+
+}
+
+message findNodeAnswer {
+
+}
+
+message findValueMessage {
+
+}
+
+message findValueAnswer {
+
+}

@@ -1,0 +1,58 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package kademlia.grpc;
+
+
+service KademliaService {
+  rpc Ping (PingRequest) returns (PingResponse);
+  rpc Store (StoreRequest) returns (StoreResponse);
+  rpc FindNode (FindNodeRequest) returns (FindNodeResponse);
+  rpc FindValue (FindValueRequest) returns (FindValueResponse);
+}
+
+
+message PingRequest {
+  Node sender = 1;
+}
+
+message PingResponse {
+  Node sender = 1;
+}
+
+message StoreRequest {
+  Node sender = 1;
+  bytes key = 2;
+  bytes value = 3;
+}
+
+message StoreResponse {
+  Node sender = 1;
+}
+
+message FindNodeRequest {
+  Node sender = 1;
+  bytes target = 2;
+}
+
+// repeated is a list
+message FindNodeResponse {
+  Node sender = 1;
+  repeated Node nodes = 2;
+}
+
+message FindValueRequest {
+  Node sender = 1;
+  bytes key = 2;
+}
+
+message FindValueResponse {
+  Node sender = 1;
+  bytes value = 2;
+  repeated Node nodes = 3;
+}
+
+message Node {
+  bytes id = 1;
+  string address = 2;
+  string pubKey = 3;
+}

@@ -4,48 +4,55 @@ package kademlia.grpc;
 
 
 service KademliaService {
-  rpc Ping(pingMessage) returns (pingAnswer);
-  rpc Store(storeMessage) returns (storeAnswer);
-  rpc FindNode(findNodeMessage) returns (findNodeAnswer);
-  rpc FindValue(findValueMessage) returns (findValueAnswer);
+  rpc Ping (PingRequest) returns (PingResponse);
+  rpc Store (StoreRequest) returns (StoreResponse);
+  rpc FindNode (FindNodeRequest) returns (FindNodeResponse);
+  rpc FindValue (FindValueRequest) returns (FindValueResponse);
 }
 
 
-// MESSAGES
-
-message pingMessage {
-  string id = 1;
-  string ip =2;
-  int32 port = 3;
+message PingRequest {
+  Node sender = 1;
 }
 
-message pingAnswer {
-  string id = 1;
-  string ip =2;
-  int32 port =3;
-  string timestamp =4;
+message PingResponse {
+  Node sender = 1;
 }
 
-message storeMessage {
-
+message StoreRequest {
+  Node sender = 1;
+  bytes key = 2;
+  bytes value = 3;
 }
 
-message storeAnswer{
-
+message StoreResponse {
+  Node sender = 1;
 }
 
-message findNodeMessage {
-
+message FindNodeRequest {
+  Node sender = 1;
+  bytes target = 2;
 }
 
-message findNodeAnswer {
-
+// repeated is a list
+message FindNodeResponse {
+  Node sender = 1;
+  repeated Node nodes = 2;
 }
 
-message findValueMessage {
-
+message FindValueRequest {
+  Node sender = 1;
+  bytes key = 2;
 }
 
-message findValueAnswer {
+message FindValueResponse {
+  Node sender = 1;
+  bytes value = 2;
+  repeated Node nodes = 3;
+}
 
+message Node {
+  bytes id = 1;
+  string address = 2;
+  string pubKey = 3;
 }

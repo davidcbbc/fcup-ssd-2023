@@ -1,5 +1,5 @@
 import io.grpc.ServerBuilder;
-import kademlia.grpc.PingImpl;
+import kademlia.grpc.implementations.PingImpl;
 
 public class Server {
 

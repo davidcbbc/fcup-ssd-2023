@@ -1,9 +1,5 @@
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import kademlia.grpc.KademliaServiceGrpc;
-import kademlia.grpc.PingImpl;
-import kademlia.grpc.pingAnswer;
-import kademlia.grpc.pingMessage;
 
 public class Client {
 
@@ -11,6 +7,7 @@ public class Client {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost",8080)
                 .usePlaintext()
                 .build();
+
 
         KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
 

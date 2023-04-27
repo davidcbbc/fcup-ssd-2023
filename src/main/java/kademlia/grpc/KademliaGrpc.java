@@ -17,7 +17,7 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     }
 
     /**
-     * Probes a node to see if it's online.
+     * This function handles the PING requests.
      * @param request with the Node that pinged
      * @param responseObserver callback
      */
@@ -26,12 +26,12 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
         Node sourceNode = request.getSender();
 
 
-        System.out.println("[+] [NODE PING MESSAGE] | IP: " + sourceNode.getAddress() + ":8080 | ID: " + sourceNode.getId());
+        System.out.println("[+] [NODE PING MESSAGE] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
 
         PingResponse response = PingResponse.newBuilder()
                 .setSender(Node.newBuilder()
                         .setAddress(this.kademliaNode.getAddress())
-                        .setId(ByteString.copyFromUtf8(this.kademliaNode.getUid()))
+                        .setId(ByteString.copyFromUtf8(this.kademliaNode.getId().toString()))
                         .setAddressBytes(ByteString.copyFromUtf8("asd"))).build();
 
         responseObserver.onNext(response);
@@ -41,6 +41,7 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
 
     /**
      * Instructs a node to store a key-value pair
+     * This function handles the STORE requests.
      * @param request StoreRequest
      * @param responseObserver StreamObserver
      */

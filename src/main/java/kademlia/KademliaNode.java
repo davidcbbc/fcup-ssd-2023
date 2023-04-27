@@ -5,49 +5,98 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import kademlia.grpc.GrpcHandler;
 import kademlia.grpc.KademliaGrpc;
 import kademlia.grpc.builders.KademliaServiceGrpc;
 import kademlia.grpc.builders.Node;
 import kademlia.grpc.builders.PingRequest;
 import kademlia.grpc.builders.PingResponse;
 
+import java.math.BigInteger;
+import java.security.PublicKey;
+
 public class KademliaNode {
 
-    private String address;
-    private final int port = 8080;
+    private final String address;
+    private final int port;
+    private final BigInteger id; //TODO create uid with 180 bits instead of string
+    private final GrpcHandler grpcHandler;
 
-    private String uid; //TODO create uid with 180 bits instead of string
+    private final PublicKey publicKey;
+
+    private RoutingTable routingTable;
 
 
-    public KademliaNode(String address, String uid) {
+    public KademliaNode(String address, BigInteger id, int port, PublicKey publicKey) {
+        // set the attributes
         this.address = address;
-        this.uid = uid; // TODO check if uid is already taken
-
-        // Start listeners
-        io.grpc.Server server = ServerBuilder
-                .forPort(8080)
-                .addService(new KademliaGrpc(this)).build();
+        this.id = id; // TODO check if uid is already taken
+        this.port = port;
+        this.publicKey=publicKey;
+        this.routingTable = new RoutingTable(this);
+        // start the grpc handler (server) for the grpc methods (PING , FIND_NODE , etc ...)
+        this.grpcHandler = new GrpcHandler(this.port,new KademliaGrpc(this));
+        this.grpcHandler.start(); // start handler thread
     }
 
 
-    public void pingNode(String address){
-        KademliaServiceGrpc.KademliaServiceBlockingStub stub = this.getStubForAddress(address);
+    /**
+     * Probes a node to see if it's online.
+     * @param address of the node to be pinged
+     * @param port of the node to be pinged
+     */
+    public void pingNode(String address, int port){
+        System.out.println("[+] PINGING NODE WITH IP " + address);
 
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(address,port)
+                .usePlaintext()
+                .build();
+
+        KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
+
+        // sending ping
         PingResponse pingResponse = stub.ping(PingRequest.newBuilder()
                         .setSender(Node.newBuilder()
                                 .setAddress(this.address)
-                                .setId(ByteString.copyFromUtf8(this.uid)).build())
+                                .setId(ByteString.copyFromUtf8(this.id.toString())).build())
                 .build());
 
-        System.out.println();
+        // ping received
+        System.out.println("[+] PING REPLY RECEIVED , NODE UID : " + pingResponse.getSender().getId());
+
+        channel.shutdown();
     }
 
-    //returns a grpc stub for the given address
-    private KademliaServiceGrpc.KademliaServiceBlockingStub getStubForAddress(String address){
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(address,8080)
-                .usePlaintext()
-                .build();
-        return KademliaServiceGrpc.newBlockingStub(channel);
+    /**
+     * Check whether two nodes are equal by comparing the ids
+     * @param obj node to compare
+     * @return t or f
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        KademliaNode node = (KademliaNode) obj;
+
+        return id.equals(node.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "id=" + this.id +
+                ", address=" + this.address +
+                '}';
     }
 
 
@@ -59,7 +108,7 @@ public class KademliaNode {
         return port;
     }
 
-    public String getUid() {
-        return uid;
+    public BigInteger getId() {
+        return this.id;
     }
 }

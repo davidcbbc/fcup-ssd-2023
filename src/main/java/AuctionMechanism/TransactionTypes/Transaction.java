@@ -2,22 +2,33 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
-import java.security.MessageDigest;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class Transaction {
 
-    private String sellerPublicKey;
-    //private String buyerPublicKey;
+    private PublicKey sellerPublicKey;
     private Item auctionedItem;
+    private byte[] hash;
+    private byte[] signature;
 
-    //private int currentBid;
-    //private LocalDateTime startTime;
-    //private LocalDateTime endTime;
-    // private TransactionStatus status;
-    private String hash;
+    public Transaction(PublicKey sellerPublicKey, Item auctionedItem) {
+        this.sellerPublicKey = sellerPublicKey;
+        //this.buyerPublicKey = null;
+        this.auctionedItem = auctionedItem;
+        //this.minimumBid = minimumBid;
+        //this.currentBid = 0;
+        //this.startTime = startTime;
+        //this.endTime = endTime;
+        //this.status = TransactionStatus.REGISTERED;
+        this.hash = calculateHash();
+        this.signature = null;
+    }
 
-    public Transaction(String sellerPublicKey, Item auctionedItem) {
+    public Transaction(PublicKey sellerPublicKey, Item auctionedItem,String hash) {
         //this.sellerPublicKey = sellerPublicKey;
         //this.buyerPublicKey = null;
         this.auctionedItem = auctionedItem;
@@ -29,23 +40,11 @@ public class Transaction {
         this.hash = null;
     }
 
-    public Transaction(String sellerPublicKey, Item auctionedItem,String hash) {
-        //this.sellerPublicKey = sellerPublicKey;
-        //this.buyerPublicKey = null;
-        this.auctionedItem = auctionedItem;
-        //this.minimumBid = minimumBid;
-        //this.currentBid = 0;
-        //this.startTime = startTime;
-        //this.endTime = endTime;
-        //this.status = TransactionStatus.REGISTERED;
-        this.hash = null;
-    }
-
-    public String getSellerPublicKey() {
+    public PublicKey getSellerPublicKey() {
         return sellerPublicKey;
     }
 
-    public void setSellerPublicKey(String sellerPublicKey) {
+    public void setSellerPublicKey(PublicKey sellerPublicKey) {
         this.sellerPublicKey = sellerPublicKey;
     }
 
@@ -106,15 +105,52 @@ public class Transaction {
         this.status = status;
     }
 */
-    public String getHash() {
+    public byte[] getHash() {
         return hash;
     }
 
-    public void setHash(String hash) {
+    public void setHash(byte[] hash) {
         this.hash = hash;
     }
 
-    public String calculateHash() {
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+
+    public void sign(PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature rsa = Signature.getInstance("SHA256withRSA");
+        rsa.initSign(privateKey);
+        rsa.update(getDataToSign());
+        this.signature = rsa.sign();
+    }
+
+    public byte[] getDataToSign() {
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        buffer.put(this.sellerPublicKey.getEncoded());
+        buffer.put(this.auctionedItem.getName().getBytes());
+
+        return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
+    }
+
+    public boolean verifySignature() {
+
+        try {
+            Signature sig = Signature.getInstance("SHA256withRSA");
+            sig.initVerify(this.sellerPublicKey);
+            sig.update(this.hash);
+            return sig.verify(this.signature);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public byte[] calculateHash() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String data = this.sellerPublicKey  + this.auctionedItem.getName();// + this.buyerPublicKey + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
@@ -130,7 +166,7 @@ public class Transaction {
             }
 
             System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
-            return hexString.toString();
+            return hexString.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

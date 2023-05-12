@@ -1,5 +1,6 @@
 package AuctionMechanism.Wallet;
 
+import AuctionMechanism.TransactionTypes.Transaction;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -46,6 +47,18 @@ public class Wallet {
 
     public PublicKey getPublicKey() {
         return publicKey;
+    }
+
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
     }
 
     public float getBalance() {
@@ -111,6 +124,20 @@ public class Wallet {
         wallet.privateKey = privateKeyEntry.getPrivateKey();
         wallet.publicKey = privateKeyEntry.getCertificate().getPublicKey();
         return wallet;
+    }
+
+    public byte[] signTransaction(byte[] hash) {
+        byte[] signatureBytes = null;
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSA");
+            signature.initSign(privateKey);
+            signature.update(hash);
+            signatureBytes = signature.sign();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+
+        return signatureBytes;
     }
 }
 

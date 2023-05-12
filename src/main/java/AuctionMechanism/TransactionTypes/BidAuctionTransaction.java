@@ -2,12 +2,17 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.PublicKey;
+import java.security.Signature;
+
 public class BidAuctionTransaction extends Transaction{
 
     private int bidAmount;
-    private String buyerPublicKey;
+    private PublicKey buyerPublicKey;
 
-    public BidAuctionTransaction(String sellerPublicKey, String buyerPublicKey, Item auctionedItem, int bidAmount){
+    public BidAuctionTransaction(PublicKey sellerPublicKey, PublicKey buyerPublicKey, Item auctionedItem, int bidAmount, byte[] signature){
         super(sellerPublicKey,auctionedItem);
         this.buyerPublicKey = buyerPublicKey;
         this.bidAmount = bidAmount;
@@ -22,11 +27,11 @@ public class BidAuctionTransaction extends Transaction{
         this.bidAmount = bidAmount;
     }
 
-    public String getBuyerPublicKey(){
+    public PublicKey getBuyerPublicKey(){
         return this.buyerPublicKey;
     }
 
-    public void setBuyerPublicKey(String buyerPublicKey){
+    public void setBuyerPublicKey(PublicKey buyerPublicKey){
         this.buyerPublicKey = buyerPublicKey;
     }
 
@@ -36,12 +41,42 @@ public class BidAuctionTransaction extends Transaction{
     }
 
     @Override
-    public String calculateHash() {
+    public byte[] calculateHash() {
         try {
-            String data = this.getSellerPublicKey()  + this.getAuctionedItem().getName() + this.bidAmount + this.buyerPublicKey ; // + this.buyerPublicKey + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
-            return data;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            String data = this.getSellerPublicKey()  + this.getAuctionedItem().getName() + this.buyerPublicKey + this.bidAmount;// + this.buyerPublicKey + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
+            byte[] hash = digest.digest(data.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
+            return hexString.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
+
+
+    @Override
+    public boolean verifySignature() {
+
+        try {
+            Signature sig = Signature.getInstance("SHA1withRSA");
+            sig.initVerify(this.buyerPublicKey);
+            sig.update(this.getSignature());
+            return sig.verify(this.getSignature());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
+
+

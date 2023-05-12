@@ -1,6 +1,8 @@
 package AuctionMechanism;
 
+import AuctionMechanism.TransactionTypes.CreateAuctionTransaction;
 import AuctionMechanism.Wallet.Wallet;
+import AuctionMechanism.util.Item;
 import org.bouncycastle.operator.OperatorCreationException;
 
 import java.awt.*;
@@ -38,7 +40,7 @@ public class Main {
 
 
         Scanner in= new Scanner(System.in);
-        Wallet wallet;
+        Wallet wallet=null;
 
         int keyChoice = -1;
         System.out.println("1 - Create new Key Pair\n2 - Import Key Pair\n");
@@ -96,6 +98,19 @@ public class Main {
             switch (choice){
                 case 1 :
                     // Call Create Auction Function
+                    System.out.println("Provide item name:" );
+                    String itemName = in.nextLine();
+                    System.out.println("Provide item description:" );
+                    String itemDesc = in.nextLine();
+                    System.out.println("Provide minimum bid:" );
+                    int minimumBid = in.nextInt();
+                    Item item = new Item(itemName, itemDesc);
+                    CreateAuctionTransaction tx = new CreateAuctionTransaction(wallet.getPublicKey(), item, minimumBid);
+                    node1.broadcastTransaction(tx);
+                    //node2.mineBlock();
+
+
+                    System.out.println("Created Auction for Item:" + itemName + " with description:" + itemDesc + " for user:" + wallet.getPublicKey().toString());
                     break;
                 case 2 :
                     // Call See Open Auction Function

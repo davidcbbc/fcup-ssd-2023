@@ -1,6 +1,7 @@
 package AuctionMechanism;
 
 import AuctionMechanism.TransactionTypes.Transaction;
+import AuctionMechanism.Wallet.Wallet;
 
 import java.util.*;
 
@@ -10,7 +11,7 @@ public class Blockchain {
     private List<Transaction> currentTransactions;
     private boolean useProofOfStake; // Added field for proof of stake
     private static  double minStakerequired = 1000; // Example: Minimum required stake to create a block is 1000
-    private Map<User, Double> validators; // Map to store validator addresses and their stakes
+    private Map<Wallet, Double> validators; // Map to store validator addresses and their stakes
 
     public Blockchain(int difficulty, boolean useProofOfStake) {
         this.chain = new ArrayList<Block>();
@@ -52,6 +53,12 @@ public class Blockchain {
     }
 
 
+    public boolean isTransactionValid(Transaction transaction) {
+        return transaction.verifySignature();
+    }
+
+
+
     public void addTransaction(Transaction transaction) {
         this.currentTransactions.add(transaction);
     }
@@ -68,9 +75,9 @@ public class Blockchain {
     }
 */
     // With Proof of Stake
-    public Block mineBlock(List<Transaction> pendingTransactions, User miner) {
+    public Block mineBlock(List<Transaction> pendingTransactions, Wallet wallet) {
 
-        if (useProofOfStake && this.validators.containsKey(miner) && miner.getBalance() >= minStakerequired) {
+        if (useProofOfStake && this.validators.containsKey(wallet) && wallet.getBalance() >= minStakerequired) {
             List<Transaction> transactions = new ArrayList<>();
             transactions.addAll(pendingTransactions);
             // Add reward transaction for main.Blockchain.User
@@ -194,29 +201,29 @@ public class Blockchain {
         return true;
     }
 
-    public void addValidator(User validator) {
+    public void addValidator(Wallet validator) {
         // Add a validator with the given address and stake to the list of validators
-        validators.put(validator, validator.getBalance());
+        validators.put(validator, Double.valueOf( validator.getBalance()));
     }
 
-    public void removeValidator(User validator) {
+    public void removeValidator(Wallet validator) {
         // Add a validator with the given address and stake to the list of validators
         validators.remove(validator);
     }
 
-    public void checkAddValidator(User validator) {
+    public void checkAddValidator(Wallet validator) {
         // Always add validator to update the balance
         //if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
         if ((validator.getBalance() >= minStakerequired))
             addValidator(validator);
     }
 
-    public void checkRemoveValidator(User validator) {
+    public void checkRemoveValidator(Wallet validator) {
         if (validator.getBalance() < minStakerequired)
             removeValidator(validator);
     }
 
-    public Map<User, Double> getValidators() {
+    public Map<Wallet, Double> getValidators() {
         return this.validators;
     }
 

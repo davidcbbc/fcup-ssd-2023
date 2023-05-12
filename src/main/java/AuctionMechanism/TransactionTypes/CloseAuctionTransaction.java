@@ -2,14 +2,16 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 
 public class CloseAuctionTransaction extends Transaction {
 
     String winnerPublicKey;
     int winningBid;
 
-    public CloseAuctionTransaction(String sellerPublicKey, Item auctionedItem, String winnerPublicKey, int winningBid) {
+    public CloseAuctionTransaction(PublicKey sellerPublicKey, Item auctionedItem, String winnerPublicKey, int winningBid, byte[] signature) {
         super(sellerPublicKey, auctionedItem);
         this.winnerPublicKey = winnerPublicKey;
         this.winningBid = winningBid;
@@ -30,7 +32,7 @@ public class CloseAuctionTransaction extends Transaction {
     }
 
     @Override
-    public String calculateHash() {
+    public byte[] calculateHash() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String data = this.getSellerPublicKey()  + this.getAuctionedItem().getName() + this.winnerPublicKey + this.winningBid ;// + this.buyerPublicKey + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
@@ -46,7 +48,7 @@ public class CloseAuctionTransaction extends Transaction {
             }
 
             System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
-            return hexString.toString();
+            return hexString.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

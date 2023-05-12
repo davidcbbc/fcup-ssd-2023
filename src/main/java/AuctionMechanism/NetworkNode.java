@@ -1,6 +1,7 @@
 package AuctionMechanism;
 
 import AuctionMechanism.TransactionTypes.Transaction;
+import AuctionMechanism.Wallet.Wallet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,9 +114,9 @@ public class NetworkNode {
         }
     }
 
-    public void mineBlock(User miner) {
+    /*public void mineBlock(Wallet wallet) {
        // blockchain.mineBlock(miner);
-        Block block = blockchain.mineBlock(pendingTransactions, miner);
+        Block block = blockchain.mineBlock(pendingTransactions, wallet);
         if (block != null) {
             broadcastBlock(block);
             // check if Users can be added to Validators list
@@ -128,6 +129,6 @@ public class NetworkNode {
                 //}
             //}
         }
-    }
+    }*/
 
 }

@@ -1,5 +1,7 @@
 package AuctionMechanism;
 
+import AuctionMechanism.TransactionTypes.Transaction;
+
 import java.util.*;
 
 public class Blockchain {

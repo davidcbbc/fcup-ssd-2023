@@ -1,5 +1,7 @@
 package AuctionMechanism;
 
+import AuctionMechanism.TransactionTypes.Transaction;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;

@@ -1,36 +1,44 @@
-package AuctionMechanism;
+package AuctionMechanism.TransactionTypes;
+
+import AuctionMechanism.util.Item;
 
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 
 public class Transaction {
 
-    public enum TransactionStatus {
-        REGISTERED,
-        BID_PLACED,
-        WINNER_DECLARED
-    }
-
     private String sellerPublicKey;
-    private String buyerPublicKey;
-    private String auctionedItem;
-    private int minimumBid;
-    private int currentBid;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private TransactionStatus status;
+    //private String buyerPublicKey;
+    private Item auctionedItem;
+
+    //private int currentBid;
+    //private LocalDateTime startTime;
+    //private LocalDateTime endTime;
+    // private TransactionStatus status;
     private String hash;
 
-    public Transaction(String sellerPublicKey, int minimumBid, LocalDateTime startTime, LocalDateTime endTime) {
-        this.sellerPublicKey = sellerPublicKey;
-        this.buyerPublicKey = null;
-        this.auctionedItem = null;
-        this.minimumBid = minimumBid;
-        this.currentBid = 0;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.status = TransactionStatus.REGISTERED;
-        this.hash = calculateHash();
+    public Transaction(String sellerPublicKey, Item auctionedItem) {
+        //this.sellerPublicKey = sellerPublicKey;
+        //this.buyerPublicKey = null;
+        this.auctionedItem = auctionedItem;
+        //this.minimumBid = minimumBid;
+        //this.currentBid = 0;
+        //this.startTime = startTime;
+        //this.endTime = endTime;
+        //this.status = TransactionStatus.REGISTERED;
+        this.hash = null;
+    }
+
+    public Transaction(String sellerPublicKey, Item auctionedItem,String hash) {
+        //this.sellerPublicKey = sellerPublicKey;
+        //this.buyerPublicKey = null;
+        this.auctionedItem = auctionedItem;
+        //this.minimumBid = minimumBid;
+        //this.currentBid = 0;
+        //this.startTime = startTime;
+        //this.endTime = endTime;
+        //this.status = TransactionStatus.REGISTERED;
+        this.hash = null;
     }
 
     public String getSellerPublicKey() {
@@ -41,6 +49,7 @@ public class Transaction {
         this.sellerPublicKey = sellerPublicKey;
     }
 
+    /*
     public String getBuyerPublicKey() {
         return buyerPublicKey;
     }
@@ -48,15 +57,15 @@ public class Transaction {
     public void setBuyerPublicKey(String buyerPublicKey) {
         this.buyerPublicKey = buyerPublicKey;
     }
-
-    public String getAuctionedItem() {
+*/
+    public Item getAuctionedItem() {
         return auctionedItem;
     }
 
-    public void setAuctionedItem(String auctionedItem) {
+    public void setAuctionedItem(Item auctionedItem) {
         this.auctionedItem = auctionedItem;
     }
-
+/*
     public int getMinimumBid() {
         return minimumBid;
     }
@@ -96,7 +105,7 @@ public class Transaction {
     public void setStatus(TransactionStatus status) {
         this.status = status;
     }
-
+*/
     public String getHash() {
         return hash;
     }
@@ -108,7 +117,7 @@ public class Transaction {
     public String calculateHash() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String data = this.sellerPublicKey + this.buyerPublicKey + this.auctionedItem + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
+            String data = this.sellerPublicKey  + this.auctionedItem.getName();// + this.buyerPublicKey + this.minimumBid + this.currentBid + this.endTime.toString() + this.startTime.toString();
             byte[] hash = digest.digest(data.getBytes("UTF-8"));
             StringBuffer hexString = new StringBuffer();
 

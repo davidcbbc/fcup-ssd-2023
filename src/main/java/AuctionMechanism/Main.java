@@ -1,18 +1,47 @@
 package AuctionMechanism;
 
+import AuctionMechanism.Wallet.Wallet;
+import org.bouncycastle.operator.OperatorCreationException;
+
 import java.awt.*;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Scanner;
 import java.security.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws GeneralSecurityException, IOException, OperatorCreationException {
 
-        Scanner in = new Scanner(System.in);
+        boolean useProofOfStake = true;
+        // create a blockchain with a genesis block
+        Blockchain blockchain = new Blockchain(3, useProofOfStake);
+        // main.Blockchain.main.Blockchain.Block genesisBlock = new main.Blockchain.main.Blockchain.Block(new ArrayList<>(), 0,"0");
+        //blockchain.addBlock(genesisBlock);
+
+        // create three network nodes with the blockchain
+        NetworkNode node1 = new NetworkNode(blockchain);
+        NetworkNode node2 = new NetworkNode(blockchain);
+        NetworkNode node3 = new NetworkNode(blockchain);
+
+        // add each node to the other nodes' peer lists
+        node1.addPeer(node2);
+        node1.addPeer(node3);
+        node2.addPeer(node1);
+        node2.addPeer(node3);
+        node3.addPeer(node1);
+        node3.addPeer(node2);
+
+
+
+
+
+
+        Scanner in= new Scanner(System.in);
+        Wallet wallet;
 
         int keyChoice = -1;
-        System.out.println("1 - Import Key Pair\n2 - Create new Key Pair\n");
+        System.out.println("1 - Create new Key Pair\n2 - Import Key Pair\n");
         System.out.println("Please Choose an option between 1 and 2");
         keyChoice = in.nextInt();
         while(keyChoice > 2 || keyChoice < 1){
@@ -20,25 +49,31 @@ public class Main {
             keyChoice = in.nextInt();
         }
 
+        System.out.println("Please Enter the Path of the Key Pair");
+        in.nextLine();
+        String path = in.nextLine();
+
+        System.out.println("Please Enter the Password of the Key Pair");
+
+        String pass = in.nextLine();
+
         switch (keyChoice){
             case 1 :
-                KeyPairGenerator keyGen = null;
+                wallet = new Wallet();
                 try {
-                    keyGen = KeyPairGenerator.getInstance("RSA");
-                    keyGen.initialize(2048);
-                    KeyPair keyPair = keyGen.generateKeyPair();
-                    // Get the public and private keys
-                    PublicKey publicKey = keyPair.getPublic();
-                    PrivateKey privateKey = keyPair.getPrivate();
-                    // Print the keys to the console
-                    System.out.println("Public Key: " + publicKey);
-                    System.out.println("Private Key: " + privateKey);
-                } catch (NoSuchAlgorithmException e) {
-                    System.out.println("Error generating key pair ");
+                    wallet.saveToFile(path, pass);
+                    System.out.println("Alice's wallet saved to " + path);
+                } catch (Exception e) {
+                    System.err.println("Error saving wallet: " + e.getMessage());
                 }
                 break;
             case 2 :
-
+                try {
+                    wallet = Wallet.loadFromFile(path, pass);
+                    System.out.println("Loaded wallet from " + path);
+                } catch (Exception e) {
+                    System.err.println("Error loading wallet: " + e.getMessage());
+                }
                 break;
             default : break;
         }
@@ -156,4 +191,7 @@ public class Main {
         }
     */
     }
+
+
+
 }

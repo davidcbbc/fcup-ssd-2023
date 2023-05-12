@@ -31,6 +31,13 @@
             <artifactId>grpc-stub</artifactId>
             <version>1.53.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>1.51</version>
+        </dependency>
+
     </dependencies>
-    
+
+
 </project>

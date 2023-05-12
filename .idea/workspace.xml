@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0511cc0a-ec84-45ef-b56b-b6be03500547" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/TransactionTypes/BidAuctionTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/TransactionTypes/CloseAuctionTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/TransactionTypes/CreateAuctionTransaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Wallet/TestWallet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Wallet/Wallet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/util/Auction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/util/Item.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Block.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Block.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Blockchain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Blockchain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/NetworkNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/NetworkNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Transaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/TransactionTypes/Transaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Wallet.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/kademlia/grpc/Ping.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/kademlia/grpc/Ping.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="7881d418-cc6a-4141-a7c2-fbefc508b985" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2OIBg27xrisMGqDjdPy5YUiSc37" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/AuctionMechanism" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.AuctionMechanism.Main">
+    <configuration name="AuctionMechanism.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="AuctionMechanism.Main" />
+      <module name="ssd" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="AuctionMechanism.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Blockchain.Main" />
+      <module name="ssd" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Blockchain.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="AuctionMechanism.Main" />
+      <module name="ssd" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="AuctionMechanism.Transaction" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestWallet" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="AuctionMechanism.Wallet.TestWallet" />
+      <module name="ssd" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="AuctionMechanism.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.AuctionMechanism.Main" />
+        <item itemvalue="Application.TestWallet" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0511cc0a-ec84-45ef-b56b-b6be03500547" name="Changes" comment="" />
+      <created>1681238326182</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1681238326182</updated>
+      <workItem from="1681238330349" duration="338000" />
+      <workItem from="1681325681463" duration="409000" />
+      <workItem from="1681396427802" duration="1135000" />
+      <workItem from="1681604337326" duration="3343000" />
+      <workItem from="1681663053331" duration="2834000" />
+      <workItem from="1683124774937" duration="663000" />
+      <workItem from="1683145619475" duration="628000" />
+      <workItem from="1683146458673" duration="181000" />
+      <workItem from="1683146650212" duration="59000" />
+      <workItem from="1683146720518" duration="37000" />
+      <workItem from="1683146771710" duration="728000" />
+      <workItem from="1683148032709" duration="7105000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

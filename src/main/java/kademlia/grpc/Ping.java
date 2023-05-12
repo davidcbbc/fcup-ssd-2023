@@ -6,6 +6,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.*;
 import kademlia.Node;
 
+/*
 public class Ping {
 
     private Node source;
@@ -44,3 +45,4 @@ public class Ping {
         channel.shutdown();
     }
 }
+*/

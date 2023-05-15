@@ -57,11 +57,11 @@ public class Block {
         System.out.println("main.Blockchain.main.Blockchain.Block:PreviousBlockHash " + this.previousBlockHash);
         System.out.println("main.Blockchain.main.Blockchain.Block:Hash " + this.hash);
         System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
-        for(Transaction transaction : this.transactions)
-        {
-            transaction.printTransaction();
-        }
-        System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
+        //for(Transaction transaction : this.transactions)
+        //{
+        //    transaction.printTransaction();
+        //}
+        //System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
         System.out.println("FIM_Block: " + this.toString());
     }
 

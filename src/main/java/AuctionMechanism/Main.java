@@ -30,11 +30,33 @@ public class Main {
         // add each node to the other nodes' peer lists
         node1.addNode(node2);
         node2.addNode(node3);
+
+        /*
+        System.out.println("Node:" + node1.toString() + " has the following nodes:");
+        for (NetworkNode node : node1.getPeers()) {
+            System.out.println("Node:" + node.toString());
+
+        }
+
+        System.out.println("Node:" + node2.toString() + " has the following nodes:");
+        for (NetworkNode node : node2.getPeers()) {
+            System.out.println("Node:" + node.toString());
+
+        }
+
+        System.out.println("Node:" + node3.toString() + " has the following nodes:");
+        for (NetworkNode node : node3.getPeers()) {
+            System.out.println("Node:" + node.toString());
+
+        } */
         Wallet wallet1 = new Wallet();
         Wallet wallet2 = new Wallet();
 
         Item item1 = new Item("it1", "it1_desc");
         Item item2 = new Item("it2", "it2_desc");
+        Item item3 = new Item("it3", "it3_desc");
+        Item item4 = new Item("it4", "it4_desc");
+        Item item5 = new Item("it5", "it5_desc");
 
         Transaction tr1 = new Transaction(wallet1.getPublicKey(), item1);
         tr1.setSignature(wallet1.signTransaction(tr1.getHash()));
@@ -42,10 +64,72 @@ public class Main {
         Transaction tr2 = new Transaction(wallet2.getPublicKey(), item2);
         tr2.setSignature(wallet2.signTransaction(tr2.getHash()));
 
-        //node2.mineBlock(wallet1);
-        node1.broadcastTransaction(tr1);
+        Transaction tr3 = new Transaction(wallet1.getPublicKey(), item3);
+        tr3.setSignature(wallet2.signTransaction(tr3.getHash()));
 
+        Transaction tr4 = new Transaction(wallet2.getPublicKey(), item4);
+        tr4.setSignature(wallet2.signTransaction(tr4.getHash()));
+
+        Transaction tr5 = new Transaction(wallet1.getPublicKey(), item5);
+        tr5.setSignature(wallet2.signTransaction(tr5.getHash()));
+
+        node2.mineBlock(wallet1);
+        node1.broadcastTransaction(tr1);
+        node3.broadcastTransaction(tr3);
+
+        /*
+        System.out.println("##deppois da 1 e 3###");
+        System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
+
+         */
         node2.mineBlock(wallet2);
+
+        // System.out.println("##depois do mineblock ###");
+
+        node3.mineBlock(wallet1);
+        node1.mineBlock(wallet2);
+
+        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());;
+
+        node3.broadcastTransaction(tr2);
+
+        //System.out.println("##deppois da 2###");
+
+        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
+
+        node1.mineBlock(wallet1);
+
+        node3.mineBlock(wallet2);
+
+        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
+
+        node2.broadcastTransaction(tr4);
+
+        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
+
+        node1.broadcastTransaction(tr5);
+
+        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
+        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
+
+        //node3.mineBlock(wallet2); // 5
+
+        //node1.mineBlock(wallet1); // 6
+
+        node2.mineBlock(wallet1); // 7
+
+        blockchain.printBlockchain();
 
 
         /*

@@ -83,7 +83,7 @@ public class Transaction {
                 hexString.append(hex);
             }
 
-            System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
+            //System.out.println("main.Blockchain.Transaction:calculateHash:data: " + data + " hashGenerated: " + hexString.toString());
             return hexString.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

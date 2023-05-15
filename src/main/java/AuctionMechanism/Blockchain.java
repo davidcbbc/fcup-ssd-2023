@@ -52,6 +52,7 @@ public class Blockchain {
         count = 0;
         for(Transaction transaction : this.getAllTransactions())
         {
+            System.out.println("main.Blockchain.main.Blockchain: Dentro do getAllTransactions() ");
             //transaction.printTransaction();
             count++;
         }
@@ -60,7 +61,7 @@ public class Blockchain {
         System.out.println("FIM_Blockchain: " + this.toString());
     }
 
-
+    // To check why failed Fabio
     public boolean isTransactionValid(Transaction transaction) {
         return transaction.verifySignature();
     }
@@ -86,35 +87,36 @@ public class Blockchain {
     // With Proof of Stake
     public Block mineBlock(List<Transaction> mempoolTransactions, Wallet wallet) {
 
-        System.out.println(this.toString() + " Blockchain.mineBlock vai validar para wallet: " + wallet.toString());
+        //System.out.println(this.toString() + " Blockchain.mineBlock vai validar para wallet: " + wallet.toString());
+        //System.out.println(this.toString() + " Blockchain.mineBlock com este numero de transactions: " + mempoolTransactions.size());
         if (useProofOfStake && this.validators.containsKey(wallet.getPublicKey()) && getWalletBalance(wallet.getPublicKey()) >= minStakerequired) {
             List<Transaction> transactions = new ArrayList<>();
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai addicionar as transacções da mempool: " + wallet.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai addicionar as transacções da mempool: " + wallet.toString());
             transactions.addAll(mempoolTransactions);
             // Add reward transaction for main.Blockchain.User
             //transactions.add(Transaction.rewardTransaction(miner));
             //miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e tenta criar bloco para wallet: " + wallet.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e tenta criar bloco para wallet: " + wallet.toString());
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer mineBlock do Bloco criado: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer addBlock após o mineBlock: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer addBlock após o mineBlock: " + block.toString());
             addBlock(block);
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e faz return do bloco: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e faz return do bloco: " + block.toString());
             return block;
         } else if (!useProofOfStake) {
             // If not using PoS, mine the block as usual
             List<Transaction> transactions = new ArrayList<>();
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai addicionar as transacções da mempool: " + wallet.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai addicionar as transacções da mempool: " + wallet.toString());
             transactions.addAll(mempoolTransactions);
             //transactions.add(Transaction.rewardTransaction(miner));
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e tenta criar bloco para wallet: " + wallet.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e tenta criar bloco para wallet: " + wallet.toString());
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer mineBlock do Bloco criado: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer addBlock após o mineBlock: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer addBlock após o mineBlock: " + block.toString());
             addBlock(block);
-            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e faz return do bloco: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e faz return do bloco: " + block.toString());
             return block;
         }
         //else if validator does not meet PoS requirements, return null
@@ -148,25 +150,25 @@ public class Blockchain {
     private boolean isValidNewBlock(Block newBlock, Block previousBlock) {
         // Check that the block's previous hash matches the hash of the last block
         if (!newBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
-            System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
+            //System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
             return false;
         }
 
         // Check that the block's hash is correct
         String hash = newBlock.calculateHash();
         if (!hash.equals(newBlock.getHash())) {
-            System.out.println(" isValidNewBlock: hash: " + hash + " newBlockHash:" + newBlock.getHash() );
+            //System.out.println(" isValidNewBlock: hash: " + hash + " newBlockHash:" + newBlock.getHash() );
             return false;
         }
 
         // Check that the block's hash satisfies the difficulty requirement
         String target = new String(new char[difficulty]).replace('\0', '0');
         if (!hash.substring(0, difficulty).equals(target)) {
-            System.out.println(" isValidNewBlock: a ultima validação"  );
+            //System.out.println(" isValidNewBlock: a ultima validação"  );
             return false;
         }
 
-        /* Verify the transactions in the block
+        /* PEDRO Verify the transactions in the block
         for (Transaction transaction : newBlock.getTransactions()) {
             if (!transaction.verifySignature()) {
                 return false;
@@ -227,13 +229,13 @@ public class Blockchain {
     }
 
     public void addBlock(Block block) {
-        System.out.println(this.toString() + " Blockchain.addBlock vai validar se é valido: " + block.toString());
-        System.out.println("Vai percorrer a blockchain:");
-        printBlockchain();
-        System.out.println(this.toString() + " Blockchain.addBlock vai validar. getLastBlockHash: " + this.getLastBlock().getHash());
-        System.out.println(this.toString() + " Blockchain.addBlock vai validar. BlockHash: " + block.getPreviousBlockHash());
+        //System.out.println(this.toString() + " Blockchain.addBlock vai validar se é valido: " + block.toString());
+        //System.out.println("Vai percorrer a blockchain:");
+        //printBlockchain();
+        //System.out.println(this.toString() + " Blockchain.addBlock vai validar. getLastBlockHash: " + this.getLastBlock().getHash());
+        //System.out.println(this.toString() + " Blockchain.addBlock vai validar. BlockHash: " + block.getPreviousBlockHash());
         if (isValidNewBlock(block, this.getLastBlock())) {
-            System.out.println(this.toString() + " Blockchain.addBlock adicionou bloco valido com sucesso: " + block.toString());
+            //System.out.println(this.toString() + " Blockchain.addBlock adicionou bloco valido com sucesso: " + block.toString());
             this.chain.add(block);
         } else {
             System.out.println(this.toString() + " Blockchain.addBlock Attempted to add invalid block to blockchain: " + block.toString());
@@ -407,7 +409,9 @@ public class Blockchain {
     public List<Transaction> getAllTransactions() {
         List<Transaction> trs = new ArrayList<>();
         for (Block block : chain) {
+            //System.out.println(this.toString() + " Blockchain.getAllTransactions o bloco: " + block.toString());
             List<Transaction> tr = block.getTransactions();
+            //System.out.println(this.toString() + " Blockchain.getAllTransactions o bloco: " + block.toString() + "numero de transactions:" + tr.size());
             trs.addAll(tr);
         }
         // if transactions are not in the blockchain how can we get it here?

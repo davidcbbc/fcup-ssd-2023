@@ -10,14 +10,14 @@ public class NetworkNode {
 
     private Blockchain blockchain;
     private List<NetworkNode> peers;
-    private List<Transaction> pendingTransactions;
+    //private List<Transaction> pendingTransactions;
     private List<Transaction> mempoolTransactions;
     //private double stake;
 
     public NetworkNode(Blockchain blockchain) {
         this.blockchain = blockchain;
         this.peers = new ArrayList<>();
-        this.pendingTransactions = new ArrayList<>();
+        //this.pendingTransactions = new ArrayList<>();
         this.mempoolTransactions = new ArrayList<>();
 
     }
@@ -37,6 +37,7 @@ public class NetworkNode {
     public void printNode() {
                 System.out.println("INICIO_Node: " + this.toString());
 
+                /*
                 System.out.println("Node:chain_INICIO ");
 
                 this.blockchain.printBlockchain();
@@ -49,24 +50,39 @@ public class NetworkNode {
                 {
                     node.printNode();
                 }
+
+
+                System.out.println("Node:peers_FIM ");
+
+                System.out.println("Node:mempool_INICIO ");
+
+                for (Transaction trx : mempoolTransactions)
+                {
+                    trx.toString();
+                }
+                */
+
                 System.out.println("Node:peers_FIM ");
 
                 System.out.println("FIM_Node: " + this.toString());
     }
 
     public void receiveTransaction(Transaction transaction) {
-        if(!this.getPendingTransactions().contains(transaction)) {
+        System.out.println("#######################RECEIVETRANSACTION#######################################################");
+        /* if(!this.getPendingTransactions().contains(transaction)) {
             System.out.println(this.toString() + " receiveTransaction adicionou transaction a pending transaction");
             addPendingTransactions(transaction);
-        }
+        } */
         // check if transaction is not already in the current lists
-        if (this.blockchain.isTransactionValid(transaction) && (!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))){
-
-            System.out.println(this.toString() + " receiveTransaction adicionou transaction a Mempool transactions");
+        //if (this.blockchain.isTransactionValid(transaction) && (!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))){
+        //Validar a Transaction PEDRO
+        //if (this.blockchain.isTransactionValid(transaction) &&  (!this.getMemPoolTransactions().contains(transaction))){
+        if (!this.getMemPoolTransactions().contains(transaction)){
+            //System.out.println(this.toString() + " receiveTransaction adicionou transaction a Mempool transactions");
             // add to mempoolTransactions
             this.addMemPoolTransactions(transaction);
             // remove from pendingTransactions
-            this.pendingTransactions.remove(transaction);
+            //this.pendingTransactions.remove(transaction);
         }
 
         //if each node adds the same transactions? Needs to be checked -->Pending transactions are store and managed by Nodes not blockchain
@@ -74,32 +90,35 @@ public class NetworkNode {
     }
 
     public void broadcastTransaction(Transaction transaction) {
-        System.out.println("BroadcastTransaction1");
+        //System.out.println("BroadcastTransaction1");
         // check if transaction is not already in the current lists
-        if ((!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))) {
+        //if ((!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))) {
+        //PEDRO validar Transaction antes de incluir na memPool
+        //if (blockchain.isTransactionValid(transaction) && (!this.getMemPoolTransactions().contains(transaction))) {
+        if ((!this.getMemPoolTransactions().contains(transaction))) {
             // adds Transaction to the pending list
-            System.out.println(this.toString() + "BroadcastTransaction adicionou transaction");
-            addPendingTransactions(transaction);
+            //System.out.println(this.toString() + "BroadcastTransaction adicionou transaction");
+            addMemPoolTransactions(transaction);
             // broadcast transactions to the other nodes
             for (NetworkNode node : peers) {
-                System.out.println(this.toString() + " BroadcastTransaction fez receiveTransaction para node: " + node.toString());
+                //System.out.println(this.toString() + " BroadcastTransaction fez receiveTransaction para node: " + node.toString());
                 node.receiveTransaction(transaction);
             }
         }
-        System.out.println("BroadcastTransaction2");
+        //System.out.println("BroadcastTransaction2");
         // execute the transaction PEDRO, deve ser aqui o execute? ou só qd for adicionado ao blockchain?
         //transaction.execute();
     }
 
     public void broadcastBlock(Block block) {
-        System.out.println(this.toString() + " Node.broadcastBlock para o block: " + block.toString());
+        //System.out.println(this.toString() + " Node.broadcastBlock para o block: " + block.toString());
 
         for (NetworkNode node : peers) {
-            System.out.println(this.toString() + " Node.broadcastBlock envia receive para o node " + node.toString());
+            //System.out.println(this.toString() + " Node.broadcastBlock envia receive para o node " + node.toString());
             node.receiveBlock(block);
         }
-        System.out.println(this.toString() + " Node.broadcastBlock limpa pending transactions");
-        pendingTransactions.clear();
+        //System.out.println(this.toString() + " Node.broadcastBlock limpa mempool transactions");
+        mempoolTransactions.clear();
     }
 
 
@@ -109,9 +128,9 @@ public class NetworkNode {
 
     public void receiveBlock(Block block) {
         // check if block is not already in the blockchain and if it's valid
-        System.out.println(this.toString() + " Node.receiveBlock para o block: " + block.toString() + " vai validar se block é valido e não está na chain");
+        //System.out.println(this.toString() + " Node.receiveBlock para o block: " + block.toString() + " vai validar se block é valido e não está na chain");
         if (!(blockchain.getChain().contains(block) && blockchain.isValidBlock(blockchain.getLastBlock().getHash(), block))) {
-            System.out.println(this.toString() + " Node.receiveBlock adiciona o bloco: " + block.toString());
+            //System.out.println(this.toString() + " Node.receiveBlock adiciona o bloco: " + block.toString());
             blockchain.addBlock(block);
             // remove transactions that were already included in the Block
             for (Transaction tr : block.getTransactions()) {
@@ -119,14 +138,14 @@ public class NetworkNode {
                     mempoolTransactions.remove(tr);
                 }
             }
-            for (Transaction tr : block.getTransactions()) {
-                if (pendingTransactions.contains(tr)) {
-                    pendingTransactions.remove(tr);
-                }
-            }
+            //for (Transaction tr : block.getTransactions()) {
+            //    if (pendingTransactions.contains(tr)) {
+            //        pendingTransactions.remove(tr);
+            //    }
+            //}
         }
-        else {
-            System.out.println(this.toString() + " Node.receiveBlock o bloco já estava na blockchain: " + block.toString());
+        else if (blockchain.isValidBlock(blockchain.getLastBlock().getHash(), block)){
+            //System.out.println(this.toString() + " Node.receiveBlock o bloco já estava na blockchain: " + block.toString());
             //if block is already in blockchain, remove the pendingTransactions
             if (blockchain.getChain().contains(block)) {
                 System.out.println(this.toString() + " Node.receiveBlock vai remover as transações do bloco da memPool: " + block.toString());
@@ -136,27 +155,38 @@ public class NetworkNode {
                         mempoolTransactions.remove(tr);
                     }
                 }
-                System.out.println(this.toString() + " Node.receiveBlock vai remover as transações do bloco da pendingTransactions: " + block.toString());
-                for (Transaction tr : block.getTransactions()) {
-                    if (pendingTransactions.contains(tr)) {
-                        pendingTransactions.remove(tr);
-                    }
-                }
+                //System.out.println(this.toString() + " Node.receiveBlock vai remover as transações do bloco da pendingTransactions: " + block.toString());
+                //for (Transaction tr : block.getTransactions()) {
+                //    if (pendingTransactions.contains(tr)) {
+                //       pendingTransactions.remove(tr);
+                //    }
+                //}
             }
+        }
+        //Block is not valid, remove from blockchain PEDRO
+        else if (blockchain.getChain().contains(block)) {
+            blockchain.getChain().remove(block);
         }
     }
 
 
     public void mineBlock(Wallet wallet) {
 
-        System.out.println(this.toString() + " Node.mineBlock vai fazer mineBlock na blockchain para wallet: " + wallet.toString());
-        Block block = blockchain.mineBlock(mempoolTransactions, wallet);
-        if (block != null) {
-            System.out.println(this.toString() + " Node.mineBlock fez mineBlock com sucesso para wallet: " + wallet.toString() + " vai fazer broadcast do block");
-            broadcastBlock(block);
+        //System.out.println(this.toString() + " Node.mineBlock vai fazer mineBlock na blockchain para wallet: " + wallet.toString());
+        //Check if there are mempoolTransactions to be included in a Block
+        if (mempoolTransactions.size()>0) {
+            Block block = blockchain.mineBlock(mempoolTransactions, wallet);
+            if (block != null) {
+                //System.out.println(this.toString() + " Node.mineBlock fez mineBlock com sucesso para wallet: " + wallet.toString() + " vai fazer broadcast do block");
+                broadcastBlock(block);
+            }
+        } else {
+            System.out.println(this.toString() + " Node.mineBlock nao existem transactions para fazer novo block");
         }
+
     }
 
+    /*
     public void addPendingTransactions( Transaction transaction) {
         this.pendingTransactions.add(transaction);
     }
@@ -164,7 +194,7 @@ public class NetworkNode {
     public List<Transaction>  getPendingTransactions() {
         return this.pendingTransactions;
     }
-
+    */
     public void addMemPoolTransactions( Transaction transaction) {
         this.mempoolTransactions.add(transaction);
     }

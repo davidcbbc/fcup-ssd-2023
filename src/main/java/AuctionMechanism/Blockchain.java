@@ -97,7 +97,7 @@ public class Blockchain {
 
         //System.out.println(this.toString() + " Blockchain.mineBlock vai validar para wallet: " + wallet.toString());
         //System.out.println(this.toString() + " Blockchain.mineBlock com este numero de transactions: " + mempoolTransactions.size());
-        if (useProofOfStake && this.validators.containsKey(wallet.getPublicKey()) && getWalletBalance(wallet.getPublicKey()) >= minStakerequired) {
+        if (useProofOfStake && this.validators.containsKey(wallet.getPublicKey()) && getWalletBalance(mempoolTransactions, wallet.getPublicKey()) >= minStakerequired) {
             List<Transaction> transactions = new ArrayList<>();
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai addicionar as transacções da mempool: " + wallet.toString());
             transactions.addAll(mempoolTransactions);
@@ -285,10 +285,10 @@ public class Blockchain {
     }
 
      */
-    public void addValidator(Wallet validator) {
+    public void addValidator(Wallet validator, List<Transaction> mempoolTransactions) {
         // Add a validator with the given address and stake to the list of validators
         //validators.put(validator, Double.valueOf( validator.getBalance()));
-        validators.put(validator, Double.valueOf( getWalletBalance(validator.getPublicKey())));
+        validators.put(validator, Double.valueOf( getWalletBalance(mempoolTransactions,validator.getPublicKey())));
     }
 
     public void removeValidator(Wallet validator) {
@@ -296,15 +296,15 @@ public class Blockchain {
         validators.remove(validator);
     }
 
-    public void checkAddValidator(Wallet validator) {
+    public void checkAddValidator(Wallet validator, List<Transaction> mempoolTransactions) {
         // Always add validator to update the balance
         //if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
-        if ((getWalletBalance(validator.getPublicKey()) >= minStakerequired))
-            addValidator(validator);
+        if ((getWalletBalance(mempoolTransactions, validator.getPublicKey()) >= minStakerequired))
+            addValidator(validator, mempoolTransactions);
     }
 
-    public void checkRemoveValidator(Wallet validator) {
-        if (getWalletBalance(validator.getPublicKey())< minStakerequired)
+    public void checkRemoveValidator(Wallet validator, List<Transaction> mempoolTransactions) {
+        if (getWalletBalance(mempoolTransactions, validator.getPublicKey())< minStakerequired)
             removeValidator(validator);
     }
 
@@ -317,7 +317,7 @@ public class Blockchain {
     }
 
 
-    private float getWalletBalance(PublicKey publicKey) {
+    private float getWalletBalance(List<Transaction> mempoolTransactions, PublicKey publicKey) {
         // check closed transactions
         float balance = 100;
 
@@ -329,13 +329,30 @@ public class Blockchain {
                 CloseAuctionTransaction closeTransaction = (CloseAuctionTransaction) tr;
                 if ( closeTransaction.getWinnerPublicKey().equals(publicKey) ) {
                     balance = balance - closeTransaction.getWinningBid();
+                } else if ( closeTransaction.getSellerPublicKey().equals(publicKey) ) {
+                    balance = balance + closeTransaction.getWinningBid();
                 }
             }
         }
-        // check openMaxBids
+        //Check also memPool Transactions
+        for (Transaction tr : mempoolTransactions) {
+
+            if (tr instanceof CloseAuctionTransaction) {
+
+                CloseAuctionTransaction closeTransaction = (CloseAuctionTransaction) tr;
+                if ( closeTransaction.getWinnerPublicKey().equals(publicKey) ) {
+                    balance = balance - closeTransaction.getWinningBid();
+                } else if ( closeTransaction.getSellerPublicKey().equals(publicKey) ) {
+                    balance = balance + closeTransaction.getWinningBid();
+                }
+            }
+        }
+        // check openMaxBids of current open Auctions
         for (BidAuctionTransaction bidTr : this.maxBids) {
             if ( bidTr.getBuyerPublicKey().equals(publicKey) ) {
                 balance = balance - bidTr.getBidAmount();
+            } else if ( bidTr.getSellerPublicKey().equals(publicKey) ) {
+                balance = balance + bidTr.getBidAmount();
             }
         }
         return balance;
@@ -421,7 +438,7 @@ public class Blockchain {
             //System.out.println(this.toString() + " Blockchain.getAllTransactions o bloco: " + block.toString() + "numero de transactions:" + tr.size());
             trs.addAll(tr);
         }
-        // if transactions are not in the blockchain how can we get it here?
+        // Mempool transactions not included, should be added where need by who need it
         //trs.addAll(mempoolTransactions);
         return trs;
     }

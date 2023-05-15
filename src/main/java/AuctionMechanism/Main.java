@@ -98,6 +98,7 @@ public class Main {
         //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());;
 
         node3.broadcastTransaction(tr2);
+        node2.broadcastTransaction(tr4);
 
         //System.out.println("##deppois da 2###");
 
@@ -113,7 +114,7 @@ public class Main {
         //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
         //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
 
-        node2.broadcastTransaction(tr4);
+        //node2.broadcastTransaction(tr4);
 
         //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
         //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());

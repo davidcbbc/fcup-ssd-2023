@@ -5,6 +5,7 @@ import AuctionMechanism.TransactionTypes.Transaction;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Random;
 
 public class Block {
     private List<Transaction> transactions;
@@ -18,7 +19,7 @@ public class Block {
         this.transactions = transactions;
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
-        this.nonce = 0;
+        this.nonce = new Random().nextInt(Integer.MAX_VALUE);;
         this.hash = calculateHash();
     }
 
@@ -26,7 +27,7 @@ public class Block {
         this.transactions = transactions;
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
-        this.nonce = 0;
+        this.nonce = new Random().nextInt(Integer.MAX_VALUE);;
         this.hash = calculateHash();
         this.validator = validator;
     }
@@ -73,6 +74,7 @@ public class Block {
             nonce++;
             hash = calculateHash();
         }
+
         System.out.println("main.Blockchain.main.Blockchain.Block mined! Nonce value: " + nonce);
         for (Transaction transaction : this.transactions) {
             //transaction.execute();

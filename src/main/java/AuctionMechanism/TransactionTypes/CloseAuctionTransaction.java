@@ -8,21 +8,21 @@ import java.security.PublicKey;
 
 public class CloseAuctionTransaction extends Transaction {
 
-    String winnerPublicKey;
-    int winningBid;
+    PublicKey winnerPublicKey;
+    float winningBid;
 
-    public CloseAuctionTransaction(PublicKey sellerPublicKey, Item auctionedItem, String winnerPublicKey, int winningBid, byte[] signature) {
+    public CloseAuctionTransaction(PublicKey sellerPublicKey, Item auctionedItem, PublicKey winnerPublicKey, float winningBid, byte[] signature) {
         super(sellerPublicKey, auctionedItem);
         this.winnerPublicKey = winnerPublicKey;
         this.winningBid = winningBid;
         this.setHash(this.calculateHash());
     }
 
-    public String getWinnerPublicKey() {
+    public PublicKey getWinnerPublicKey() {
         return winnerPublicKey;
     }
 
-    public void setWinnerPublicKey(String winnerPublicKey) {
+    public void setWinnerPublicKey(PublicKey winnerPublicKey) {
         this.winnerPublicKey = winnerPublicKey;
     }
 
@@ -52,5 +52,9 @@ public class CloseAuctionTransaction extends Transaction {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public float getWinningBid() {
+        return winningBid;
     }
 }

@@ -11,20 +11,20 @@ import java.util.Arrays;
 public class CreateAuctionTransaction extends Transaction {
 
 
-    private int minimumBid;
+    private float minimumBid;
 
-    public CreateAuctionTransaction(PublicKey sellerPublicKey, Item auctionedItem, int minimumBid){
+    public CreateAuctionTransaction(PublicKey sellerPublicKey, Item auctionedItem,float minimumBid){
         super(sellerPublicKey,auctionedItem);
         this.minimumBid = minimumBid;
         this.setHash(this.calculateHash());
 
     }
 
-    public int getMinimumBid() {
+    public float getMinimumBid() {
         return minimumBid;
     }
 
-    public void setMinimumBid(int minimumBid) {
+    public void setMinimumBid(float minimumBid) {
         this.minimumBid = minimumBid;
     }
 
@@ -33,15 +33,6 @@ public class CreateAuctionTransaction extends Transaction {
         return "Seller: " + this.getSellerPublicKey() + "\nItem: " + this.getAuctionedItem().getName() + "\nDescription: " + this.getAuctionedItem().getDescription() + "\nMinimum Bid: " + this.minimumBid + "\nSignature: " + this.getSignature() + "\nHash: " + this.getHash() + "\n ";
     }
 
-    @Override
-    public byte[] getDataToSign() {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        buffer.put(this.getSellerPublicKey().getEncoded());
-        buffer.put(this.getAuctionedItem().getName().getBytes());
-        buffer.putInt(this.minimumBid);
-
-        return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
-    }
     @Override
     public byte[] calculateHash() {
         try {
@@ -64,12 +55,5 @@ public class CreateAuctionTransaction extends Transaction {
             throw new RuntimeException(ex);
         }
     }
-
-
-
-
-
-
-
 
 }

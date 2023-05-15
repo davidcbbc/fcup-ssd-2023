@@ -1,14 +1,21 @@
 package AuctionMechanism;
 
+import AuctionMechanism.TransactionTypes.BidAuctionTransaction;
+import AuctionMechanism.TransactionTypes.CloseAuctionTransaction;
+import AuctionMechanism.TransactionTypes.CreateAuctionTransaction;
 import AuctionMechanism.TransactionTypes.Transaction;
 import AuctionMechanism.Wallet.Wallet;
+import AuctionMechanism.util.Item;
 
+import java.security.PublicKey;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Blockchain {
     private List<Block> chain;
     private int difficulty;
-    private List<Transaction> currentTransactions;
+    private List<BidAuctionTransaction> maxBids;
+    //private List<Transaction> mempoolTransactions; Tem ou não tem uma mempool na blockchain??!
     private boolean useProofOfStake; // Added field for proof of stake
     private static  double minStakerequired = 1000; // Example: Minimum required stake to create a block is 1000
     private Map<Wallet, Double> validators; // Map to store validator addresses and their stakes
@@ -16,7 +23,8 @@ public class Blockchain {
     public Blockchain(int difficulty, boolean useProofOfStake) {
         this.chain = new ArrayList<Block>();
         this.difficulty = difficulty;
-        this.currentTransactions = new ArrayList<Transaction>();
+        //this.mempoolTransactions = new ArrayList<Transaction>();
+        this.maxBids = new ArrayList<BidAuctionTransaction>();
         this.chain.add(createGenesisBlock());
         this.useProofOfStake = useProofOfStake; // Initialize useProofOfStake field
         if (useProofOfStake) {
@@ -42,7 +50,7 @@ public class Blockchain {
         System.out.println("main.Blockchain.main.Blockchain:Blocks_FIM: " + count + " BLOCKS");
         System.out.println("main.Blockchain.main.Blockchain:Transactions_INICIO ");
         count = 0;
-        for(Transaction transaction : this.currentTransactions)
+        for(Transaction transaction : this.getAllTransactions())
         {
             //transaction.printTransaction();
             count++;
@@ -59,9 +67,10 @@ public class Blockchain {
 
 
 
-    public void addTransaction(Transaction transaction) {
-        this.currentTransactions.add(transaction);
-    }
+    //public void addPendingTransaction(Transaction transaction) {
+
+    //    this.pendingTransactions.add(transaction);
+    //}
 
 
 /*
@@ -75,24 +84,37 @@ public class Blockchain {
     }
 */
     // With Proof of Stake
-    public Block mineBlock(List<Transaction> pendingTransactions, Wallet wallet) {
+    public Block mineBlock(List<Transaction> mempoolTransactions, Wallet wallet) {
 
-        if (useProofOfStake && this.validators.containsKey(wallet) && wallet.getBalance() >= minStakerequired) {
+        System.out.println(this.toString() + " Blockchain.mineBlock vai validar para wallet: " + wallet.toString());
+        if (useProofOfStake && this.validators.containsKey(wallet.getPublicKey()) && getWalletBalance(wallet.getPublicKey()) >= minStakerequired) {
             List<Transaction> transactions = new ArrayList<>();
-            transactions.addAll(pendingTransactions);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai addicionar as transacções da mempool: " + wallet.toString());
+            transactions.addAll(mempoolTransactions);
             // Add reward transaction for main.Blockchain.User
             //transactions.add(Transaction.rewardTransaction(miner));
             //miner.subtractBalance(1); // Decrease stake by 1 for successful block creation
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e tenta criar bloco para wallet: " + wallet.toString());
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer addBlock após o mineBlock: " + block.toString());
+            addBlock(block);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e faz return do bloco: " + block.toString());
             return block;
         } else if (!useProofOfStake) {
             // If not using PoS, mine the block as usual
             List<Transaction> transactions = new ArrayList<>();
-            transactions.addAll(pendingTransactions);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai addicionar as transacções da mempool: " + wallet.toString());
+            transactions.addAll(mempoolTransactions);
             //transactions.add(Transaction.rewardTransaction(miner));
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e tenta criar bloco para wallet: " + wallet.toString());
             Block block = new Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer addBlock após o mineBlock: " + block.toString());
+            addBlock(block);
+            System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e faz return do bloco: " + block.toString());
             return block;
         }
         //else if validator does not meet PoS requirements, return null
@@ -103,7 +125,18 @@ public class Blockchain {
 
         main.Blockchain.main.Blockchain.Block block = new main.Blockchain.main.Blockchain.Block(transactions, new Date().getTime(), this.getLastBlock().getHash());
         block.mineBlock(this.difficulty);
-        return block; */
+        return block;
+
+
+        //only checks if the buyer of the transaction still has enough balance to be in the Validators
+                    if (transaction instanceof CloseAuctionTransaction) {
+                        // checks if balance < minStakerequired
+                        if (transaction.)
+                        //blockchain.checkRemoveValidator(transaction.getSender());
+
+                    }
+
+      */
     }
 
     public boolean isValidBlock(String previousBlockHash, Block block) {
@@ -112,6 +145,39 @@ public class Blockchain {
         return block.getPreviousBlockHash().equals(previousBlockHash) && hash.substring(0, this.difficulty).equals(prefix);
     }
 
+    private boolean isValidNewBlock(Block newBlock, Block previousBlock) {
+        // Check that the block's previous hash matches the hash of the last block
+        if (!newBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
+            System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
+            return false;
+        }
+
+        // Check that the block's hash is correct
+        String hash = newBlock.calculateHash();
+        if (!hash.equals(newBlock.getHash())) {
+            System.out.println(" isValidNewBlock: hash: " + hash + " newBlockHash:" + newBlock.getHash() );
+            return false;
+        }
+
+        // Check that the block's hash satisfies the difficulty requirement
+        String target = new String(new char[difficulty]).replace('\0', '0');
+        if (!hash.substring(0, difficulty).equals(target)) {
+            System.out.println(" isValidNewBlock: a ultima validação"  );
+            return false;
+        }
+
+        /* Verify the transactions in the block
+        for (Transaction transaction : newBlock.getTransactions()) {
+            if (!transaction.verifySignature()) {
+                return false;
+            }
+        } */
+
+        // All checks passed, so the block is valid
+        return true;
+    }
+
+    /*
     public boolean isValidChain() {
         for (int i = 1; i < this.chain.size(); i++) {
             Block currentBlock = this.chain.get(i);
@@ -128,11 +194,11 @@ public class Blockchain {
 
         return true;
     }
-
+*/
     public void replaceChain(List<Block> newChain) {
         if (isChainLengthValid(newChain) && isChainValid(newChain)) {
             this.chain = newChain;
-            this.currentTransactions = new ArrayList<Transaction>();
+            //this.pendingTransactions = new ArrayList<Transaction>();
         }
     }
 
@@ -161,11 +227,16 @@ public class Blockchain {
     }
 
     public void addBlock(Block block) {
-        // substituido pelo de baixo
-        //if (block.isValidBlock(block.getPreviousBlockHash()) && block.getPreviousBlockHash().equals(this.getLastBlock().getHash())) {
-        if (isValidBlock(this.getLastBlock().getHash(), block)) {
+        System.out.println(this.toString() + " Blockchain.addBlock vai validar se é valido: " + block.toString());
+        System.out.println("Vai percorrer a blockchain:");
+        printBlockchain();
+        System.out.println(this.toString() + " Blockchain.addBlock vai validar. getLastBlockHash: " + this.getLastBlock().getHash());
+        System.out.println(this.toString() + " Blockchain.addBlock vai validar. BlockHash: " + block.getPreviousBlockHash());
+        if (isValidNewBlock(block, this.getLastBlock())) {
+            System.out.println(this.toString() + " Blockchain.addBlock adicionou bloco valido com sucesso: " + block.toString());
             this.chain.add(block);
-            this.currentTransactions.addAll(block.getTransactions());
+        } else {
+            System.out.println(this.toString() + " Blockchain.addBlock Attempted to add invalid block to blockchain: " + block.toString());
         }
     }
 
@@ -177,9 +248,11 @@ public class Blockchain {
         return this.chain;
     }
 
-    public List<Transaction> getTransactions() {
-        return this.currentTransactions;
-    }
+    //public List<Transaction> getPendingTransactions() {
+    //    return this.pendingTransactions;
+    //}
+
+    /*
     public boolean validateProofOfStake(String validatorAddress) {
         // Example implementation of PoS validation with stake and ownership checks
 
@@ -201,9 +274,11 @@ public class Blockchain {
         return true;
     }
 
+     */
     public void addValidator(Wallet validator) {
         // Add a validator with the given address and stake to the list of validators
-        validators.put(validator, Double.valueOf( validator.getBalance()));
+        //validators.put(validator, Double.valueOf( validator.getBalance()));
+        validators.put(validator, Double.valueOf( getWalletBalance(validator.getPublicKey())));
     }
 
     public void removeValidator(Wallet validator) {
@@ -214,17 +289,166 @@ public class Blockchain {
     public void checkAddValidator(Wallet validator) {
         // Always add validator to update the balance
         //if ( !validators.containsKey(validator) && (validator.getBalance() >= minStakerequired))
-        if ((validator.getBalance() >= minStakerequired))
+        if ((getWalletBalance(validator.getPublicKey()) >= minStakerequired))
             addValidator(validator);
     }
 
     public void checkRemoveValidator(Wallet validator) {
-        if (validator.getBalance() < minStakerequired)
+        if (getWalletBalance(validator.getPublicKey())< minStakerequired)
             removeValidator(validator);
     }
 
     public Map<Wallet, Double> getValidators() {
         return this.validators;
     }
+
+    public boolean getUseProofOfStake() {
+        return this.useProofOfStake;
+    }
+
+
+    private float getWalletBalance(PublicKey publicKey) {
+        // check closed transactions
+        float balance = 100;
+
+        //Need to get transactions from the blocks and not this list that must be the Transactions not yet in the Blockchain Blocks
+        for (Transaction tr : this.getAllTransactions()) {
+
+            if (tr instanceof CloseAuctionTransaction) {
+
+                CloseAuctionTransaction closeTransaction = (CloseAuctionTransaction) tr;
+                if ( closeTransaction.getWinnerPublicKey().equals(publicKey) ) {
+                    balance = balance - closeTransaction.getWinningBid();
+                }
+            }
+        }
+        // check openMaxBids
+        for (BidAuctionTransaction bidTr : this.maxBids) {
+            if ( bidTr.getBuyerPublicKey().equals(publicKey) ) {
+                balance = balance - bidTr.getBidAmount();
+            }
+        }
+        return balance;
+
+    }
+
+
+    /*public void addTransaction(Transaction transaction) {
+        // Validate the transaction
+        if (transactionValid(transaction)) {
+            mempoolTransactions.add(transaction);
+        } else {
+            // Handle invalid transaction
+        }
+    } */
+    public boolean transactionValid(Transaction transaction) {
+        // Check if the transaction signature is valid
+        if (!transaction.verifySignature()) {
+            return false;
+        }
+
+        if (transaction instanceof CreateAuctionTransaction) {
+            // The sender doesn't need enough balance to create an auction
+            return true;
+        }
+
+        if (transaction instanceof CloseAuctionTransaction) {
+            // The sender doesn't need enough balance to create an auction
+            return true;
+        }
+
+        if (transaction instanceof BidAuctionTransaction) {
+            BidAuctionTransaction bid = (BidAuctionTransaction) transaction;
+
+
+            // Check if the Buyer has enough balance
+            double senderBalance = getWalletBalance(bid.getBuyerPublicKey());
+            if (senderBalance < bid.getBidAmount()) {
+                return false;
+            }
+
+            // Check if the auction exists and is open
+            if (!(checkAuctionOpen(bid.getAuctionedItem()))) {
+                return false;
+            }
+
+            // Check if the bid is higher than the current highest bid
+            BidAuctionTransaction highestBid = getHighestBid(bid.getAuctionedItem());
+            if (highestBid != null && bid.getBidAmount() <= highestBid.getBidAmount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkAuctionOpen(Item auctionedItem) {
+        boolean flag = false;
+
+        List<Transaction> allTransactions = this.getAllTransactions();
+        for (Transaction tr : allTransactions) {
+            if (tr instanceof CreateAuctionTransaction) {
+                CreateAuctionTransaction createTr = (CreateAuctionTransaction) tr;
+                if (createTr.getAuctionedItem().equals(auctionedItem)) {
+                    flag = true;
+                }
+            }
+            if (tr instanceof CloseAuctionTransaction) {
+                CloseAuctionTransaction closeTr = (CloseAuctionTransaction) tr;
+                if (closeTr.getAuctionedItem().equals(auctionedItem)) {
+                    flag = false;
+                }
+            }
+        }
+
+        return flag;
+    }
+
+
+    public List<Transaction> getAllTransactions() {
+        List<Transaction> trs = new ArrayList<>();
+        for (Block block : chain) {
+            List<Transaction> tr = block.getTransactions();
+            trs.addAll(tr);
+        }
+        // if transactions are not in the blockchain how can we get it here?
+        //trs.addAll(mempoolTransactions);
+        return trs;
+    }
+
+    public BidAuctionTransaction getHighestBid(Item auctionedItem) {
+        BidAuctionTransaction highestBid = null;
+        List<Transaction> allTransactions = this.getAllTransactions();
+        for (Transaction tr : allTransactions) {
+            if (tr instanceof BidAuctionTransaction) {
+                BidAuctionTransaction bidTr = (BidAuctionTransaction) tr;
+                if (bidTr.getAuctionedItem().equals(auctionedItem)) {
+                    if (highestBid == null || bidTr.getBidAmount() > highestBid.getBidAmount()) {
+                        highestBid = bidTr;
+                    }
+                }
+            }
+        }
+        return highestBid;
+    }
+
+    public List<Transaction> getTransactionsByType(Class<? extends Transaction> transactionType) {
+        List<Transaction> trs_output = new ArrayList<>();
+        //checks all blocks
+        for (Block block : chain) {
+            List<Transaction> trs = block.getTransactions();
+            //checks all transactions
+            for ( Transaction tr : trs) {
+                //Only the specified transaction type is added
+                if (transactionType.isInstance(tr)) {
+                    trs_output.add(tr);
+                }
+            }
+
+        }
+        return trs_output;
+    }
+
+    // TO CHECK: When an Auction is closed, we need to check if the buyer still has:
+    //  an amount > minStakerequired to be in the Validators list
 
 }

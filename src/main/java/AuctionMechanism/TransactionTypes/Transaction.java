@@ -17,27 +17,9 @@ public class Transaction {
 
     public Transaction(PublicKey sellerPublicKey, Item auctionedItem) {
         this.sellerPublicKey = sellerPublicKey;
-        //this.buyerPublicKey = null;
         this.auctionedItem = auctionedItem;
-        //this.minimumBid = minimumBid;
-        //this.currentBid = 0;
-        //this.startTime = startTime;
-        //this.endTime = endTime;
-        //this.status = TransactionStatus.REGISTERED;
         this.hash = calculateHash();
         this.signature = null;
-    }
-
-    public Transaction(PublicKey sellerPublicKey, Item auctionedItem,String hash) {
-        //this.sellerPublicKey = sellerPublicKey;
-        //this.buyerPublicKey = null;
-        this.auctionedItem = auctionedItem;
-        //this.minimumBid = minimumBid;
-        //this.currentBid = 0;
-        //this.startTime = startTime;
-        //this.endTime = endTime;
-        //this.status = TransactionStatus.REGISTERED;
-        this.hash = null;
     }
 
     public PublicKey getSellerPublicKey() {
@@ -48,15 +30,6 @@ public class Transaction {
         this.sellerPublicKey = sellerPublicKey;
     }
 
-    /*
-    public String getBuyerPublicKey() {
-        return buyerPublicKey;
-    }
-
-    public void setBuyerPublicKey(String buyerPublicKey) {
-        this.buyerPublicKey = buyerPublicKey;
-    }
-*/
     public Item getAuctionedItem() {
         return auctionedItem;
     }
@@ -64,47 +37,7 @@ public class Transaction {
     public void setAuctionedItem(Item auctionedItem) {
         this.auctionedItem = auctionedItem;
     }
-/*
-    public int getMinimumBid() {
-        return minimumBid;
-    }
 
-    public void setMinimumBid(int minimumBid) {
-        this.minimumBid = minimumBid;
-    }
-
-    public int getCurrentBid() {
-        return currentBid;
-    }
-
-    public void setCurrentBid(int currentBid) {
-        this.currentBid = currentBid;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public TransactionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TransactionStatus status) {
-        this.status = status;
-    }
-*/
     public byte[] getHash() {
         return hash;
     }
@@ -119,21 +52,6 @@ public class Transaction {
 
     public void setSignature(byte[] signature) {
         this.signature = signature;
-    }
-
-    public void sign(PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature rsa = Signature.getInstance("SHA256withRSA");
-        rsa.initSign(privateKey);
-        rsa.update(getDataToSign());
-        this.signature = rsa.sign();
-    }
-
-    public byte[] getDataToSign() {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        buffer.put(this.sellerPublicKey.getEncoded());
-        buffer.put(this.auctionedItem.getName().getBytes());
-
-        return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
     }
 
     public boolean verifySignature() {

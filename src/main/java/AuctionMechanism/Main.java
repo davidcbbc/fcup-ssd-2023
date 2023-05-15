@@ -1,6 +1,7 @@
 package AuctionMechanism;
 
 import AuctionMechanism.TransactionTypes.CreateAuctionTransaction;
+import AuctionMechanism.TransactionTypes.Transaction;
 import AuctionMechanism.Wallet.Wallet;
 import AuctionMechanism.util.Item;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -15,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) throws GeneralSecurityException, IOException, OperatorCreationException {
 
-        boolean useProofOfStake = true;
+        boolean useProofOfStake = false;
         // create a blockchain with a genesis block
         Blockchain blockchain = new Blockchain(3, useProofOfStake);
         // main.Blockchain.main.Blockchain.Block genesisBlock = new main.Blockchain.main.Blockchain.Block(new ArrayList<>(), 0,"0");
@@ -27,18 +28,27 @@ public class Main {
         NetworkNode node3 = new NetworkNode(blockchain);
 
         // add each node to the other nodes' peer lists
-        node1.addPeer(node2);
-        node1.addPeer(node3);
-        node2.addPeer(node1);
-        node2.addPeer(node3);
-        node3.addPeer(node1);
-        node3.addPeer(node2);
+        node1.addNode(node2);
+        node2.addNode(node3);
+        Wallet wallet1 = new Wallet();
+        Wallet wallet2 = new Wallet();
+
+        Item item1 = new Item("it1", "it1_desc");
+        Item item2 = new Item("it2", "it2_desc");
+
+        Transaction tr1 = new Transaction(wallet1.getPublicKey(), item1);
+        tr1.setSignature(wallet1.signTransaction(tr1.getHash()));
+
+        Transaction tr2 = new Transaction(wallet2.getPublicKey(), item2);
+        tr2.setSignature(wallet2.signTransaction(tr2.getHash()));
+
+        //node2.mineBlock(wallet1);
+        node1.broadcastTransaction(tr1);
+
+        node2.mineBlock(wallet2);
 
 
-
-
-
-
+        /*
         Scanner in= new Scanner(System.in);
         Wallet wallet=null;
 
@@ -107,13 +117,14 @@ public class Main {
                     Item item = new Item(itemName, itemDesc);
                     CreateAuctionTransaction tx = new CreateAuctionTransaction(wallet.getPublicKey(), item, minimumBid);
                     node1.broadcastTransaction(tx);
-                    //node2.mineBlock();
-
+                    node2.mineBlock(wallet);
 
                     System.out.println("Created Auction for Item:" + itemName + " with description:" + itemDesc + " for user:" + wallet.getPublicKey().toString());
                     break;
                 case 2 :
                     // Call See Open Auction Function
+
+
                     break;
                 case 3 :
                     // Call Make Bid Function
@@ -132,7 +143,7 @@ public class Main {
         }
 
 
-
+    */
 
 
 

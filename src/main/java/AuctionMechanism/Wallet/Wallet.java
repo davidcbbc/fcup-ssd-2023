@@ -25,11 +25,12 @@ import java.security.cert.X509Certificate;
 public class Wallet {
     private PublicKey publicKey;
     private PrivateKey privateKey;
-    private float balance;
+    private float initial_balance;
 
     public Wallet() {
         generateKeyPair();
-        this.balance = 0;
+        // All wallets initially have a balance of 100
+        this.initial_balance = 100;
     }
 
     private void generateKeyPair() {
@@ -61,12 +62,12 @@ public class Wallet {
         this.privateKey = privateKey;
     }
 
-    public float getBalance() {
-        return balance;
+    public float getInitialBalance() {
+        return initial_balance;
     }
 
-    public void setBalance(float balance) {
-        this.balance = balance;
+    public void setInitialBalance(float balance) {
+        this.initial_balance = balance;
     }
 
     public void saveToFile(String filePath, String passphrase) throws KeyStoreException, NoSuchAlgorithmException,

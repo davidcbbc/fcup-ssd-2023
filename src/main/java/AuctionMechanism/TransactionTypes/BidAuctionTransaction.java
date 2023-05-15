@@ -9,21 +9,21 @@ import java.security.Signature;
 
 public class BidAuctionTransaction extends Transaction{
 
-    private int bidAmount;
+    private float bidAmount;
     private PublicKey buyerPublicKey;
 
-    public BidAuctionTransaction(PublicKey sellerPublicKey, PublicKey buyerPublicKey, Item auctionedItem, int bidAmount, byte[] signature){
+    public BidAuctionTransaction(PublicKey sellerPublicKey, PublicKey buyerPublicKey, Item auctionedItem, float bidAmount, byte[] signature){
         super(sellerPublicKey,auctionedItem);
         this.buyerPublicKey = buyerPublicKey;
         this.bidAmount = bidAmount;
         this.setHash(this.calculateHash());
     }
 
-    public int getBidAmount() {
+    public float getBidAmount() {
         return bidAmount;
     }
 
-    public void setBidAmount(int bidAmount) {
+    public void setBidAmount(float bidAmount) {
         this.bidAmount = bidAmount;
     }
 

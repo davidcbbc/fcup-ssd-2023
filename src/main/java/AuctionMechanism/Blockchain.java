@@ -61,6 +61,14 @@ public class Blockchain {
         System.out.println("FIM_Blockchain: " + this.toString());
     }
 
+    public List<BidAuctionTransaction> getMaxBids() {
+        return maxBids;
+    }
+
+    public void setMaxBids(List<BidAuctionTransaction> maxBids) {
+        this.maxBids = maxBids;
+    }
+
     // To check why failed Fabio
     public boolean isTransactionValid(Transaction transaction) {
         return transaction.verifySignature();
@@ -331,7 +339,6 @@ public class Blockchain {
             }
         }
         return balance;
-
     }
 
 
@@ -343,7 +350,7 @@ public class Blockchain {
             // Handle invalid transaction
         }
     } */
-    public boolean transactionValid(Transaction transaction) {
+    /*public boolean transactionValid(Transaction transaction) {
         // Check if the transaction signature is valid
         if (!transaction.verifySignature()) {
             return false;
@@ -382,8 +389,8 @@ public class Blockchain {
         }
         return true;
     }
-
-    public boolean checkAuctionOpen(Item auctionedItem) {
+    */
+    /*public boolean checkAuctionOpen(Item auctionedItem) {
         boolean flag = false;
 
         List<Transaction> allTransactions = this.getAllTransactions();
@@ -403,7 +410,7 @@ public class Blockchain {
         }
 
         return flag;
-    }
+    }*/
 
 
     public List<Transaction> getAllTransactions() {
@@ -419,7 +426,7 @@ public class Blockchain {
         return trs;
     }
 
-    public BidAuctionTransaction getHighestBid(Item auctionedItem) {
+    /*public BidAuctionTransaction getHighestBid(Item auctionedItem) {
         BidAuctionTransaction highestBid = null;
         List<Transaction> allTransactions = this.getAllTransactions();
         for (Transaction tr : allTransactions) {
@@ -433,7 +440,7 @@ public class Blockchain {
             }
         }
         return highestBid;
-    }
+    }*/
 
     public List<Transaction> getTransactionsByType(Class<? extends Transaction> transactionType) {
         List<Transaction> trs_output = new ArrayList<>();

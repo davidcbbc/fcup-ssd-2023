@@ -2,7 +2,9 @@ package AuctionMechanism;
 
 import AuctionMechanism.TransactionTypes.*;
 import AuctionMechanism.Wallet.Wallet;
+import AuctionMechanism.util.Item;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +78,13 @@ public class NetworkNode {
         // check if transaction is not already in the current lists
         //if (this.blockchain.isTransactionValid(transaction) && (!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))){
         //Validar a Transaction PEDRO
+        if (transactionValid(transaction) && (!this.getMemPoolTransactions().contains(transaction))){
+            System.out.println(transaction.getAuctionedItem().getName() + " -> VERIFIED TRANSACTION");
+        }else {
+            System.out.println(transaction.getAuctionedItem().getName() + " -> UNVERIFIED TRANSACTION");
+            return;
+        }
+
         //if (this.blockchain.isTransactionValid(transaction) &&  (!this.getMemPoolTransactions().contains(transaction))){
         if (!this.getMemPoolTransactions().contains(transaction)){
             //System.out.println(this.toString() + " receiveTransaction adicionou transaction a Mempool transactions");
@@ -94,6 +103,12 @@ public class NetworkNode {
         // check if transaction is not already in the current lists
         //if ((!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))) {
         //PEDRO validar Transaction antes de incluir na memPool
+        if (transactionValid(transaction) && (!this.getMemPoolTransactions().contains(transaction))){
+            System.out.println(transaction.getAuctionedItem().getName() + " -> VERIFIED TRANSACTION");
+        }else {
+            System.out.println(transaction.getAuctionedItem().getName() + " -> UNVERIFIED TRANSACTION");
+            return;
+        }
         //if (blockchain.isTransactionValid(transaction) && (!this.getMemPoolTransactions().contains(transaction))) {
         if ((!this.getMemPoolTransactions().contains(transaction))) {
             // adds Transaction to the pending list
@@ -237,4 +252,123 @@ public class NetworkNode {
     public List<NetworkNode> getPeers() {
         return peers;
     }
+
+    public boolean transactionValid(Transaction transaction) {
+        // Check if the transaction signature is valid
+        if (!transaction.verifySignature()) {
+            return false;
+        }
+
+        if (transaction instanceof CreateAuctionTransaction) {
+            // The sender doesn't need enough balance to create an auction
+            return true;
+        }
+
+        if (transaction instanceof CloseAuctionTransaction) {
+            // The sender doesn't need enough balance to create an auction
+            return true;
+        }
+
+        if (transaction instanceof BidAuctionTransaction) {
+            BidAuctionTransaction bid = (BidAuctionTransaction) transaction;
+
+
+            // Check if the Buyer has enough balance
+            double senderBalance = getWalletBalance(bid.getBuyerPublicKey());
+            if (senderBalance < bid.getBidAmount()) {
+                return false;
+            }
+
+            // Check if the auction exists and is open
+            if (!(checkAuctionOpen(bid.getAuctionedItem()))) {
+                return false;
+            }
+
+            // Check if the bid is higher than the current highest bid
+            BidAuctionTransaction highestBid = getHighestBid(bid.getAuctionedItem());
+            if (highestBid != null && bid.getBidAmount() <= highestBid.getBidAmount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkAuctionOpen(Item auctionedItem) {
+        boolean flag = false;
+
+        List<Transaction> allTransactions = this.getAllTransactions();
+        for (Transaction tr : allTransactions) {
+            if (tr instanceof CreateAuctionTransaction) {
+                CreateAuctionTransaction createTr = (CreateAuctionTransaction) tr;
+                if (createTr.getAuctionedItem().equals(auctionedItem)) {
+                    flag = true;
+                }
+            }
+            if (tr instanceof CloseAuctionTransaction) {
+                CloseAuctionTransaction closeTr = (CloseAuctionTransaction) tr;
+                if (closeTr.getAuctionedItem().equals(auctionedItem)) {
+                    flag = false;
+                }
+            }
+        }
+        return flag;
+    }
+
+    public BidAuctionTransaction getHighestBid(Item auctionedItem) {
+        BidAuctionTransaction highestBid = null;
+        List<Transaction> allTransactions = this.getAllTransactions();
+        for (Transaction tr : allTransactions) {
+            if (tr instanceof BidAuctionTransaction) {
+                BidAuctionTransaction bidTr = (BidAuctionTransaction) tr;
+                if (bidTr.getAuctionedItem().equals(auctionedItem)) {
+                    if (highestBid == null || bidTr.getBidAmount() > highestBid.getBidAmount()) {
+                        highestBid = bidTr;
+                    }
+                }
+            }
+        }
+        return highestBid;
+    }
+
+    private float getWalletBalance(PublicKey publicKey) {
+        // check closed transactions
+        float balance = 100;
+
+        //Need to get transactions from the blocks and not this list that must be the Transactions not yet in the Blockchain Blocks
+        for (Transaction tr : this.getAllTransactions()) {
+
+            if (tr instanceof CloseAuctionTransaction) {
+
+                CloseAuctionTransaction closeTransaction = (CloseAuctionTransaction) tr;
+                if ( closeTransaction.getWinnerPublicKey().equals(publicKey) ) {
+                    balance = balance - closeTransaction.getWinningBid();
+                }else if ( closeTransaction.getSellerPublicKey().equals(publicKey) ) {
+                    balance = balance + closeTransaction.getWinningBid();
+                }
+            }
+        }
+        // check openMaxBids
+        for (BidAuctionTransaction bidTr : this.blockchain.getMaxBids()) {
+            if ( bidTr.getBuyerPublicKey().equals(publicKey) ) {
+                balance = balance - bidTr.getBidAmount();
+            }
+        }
+
+        return balance;
+    }
+
+    public List<Transaction> getAllTransactions() {
+        List<Transaction> trs = new ArrayList<>();
+        for (Block block : this.blockchain.getChain()) {
+            //System.out.println(this.toString() + " Blockchain.getAllTransactions o bloco: " + block.toString());
+            List<Transaction> tr = block.getTransactions();
+            //System.out.println(this.toString() + " Blockchain.getAllTransactions o bloco: " + block.toString() + "numero de transactions:" + tr.size());
+            trs.addAll(tr);
+        }
+        // if transactions are not in the blockchain how can we get it here?
+        trs.addAll(mempoolTransactions);
+        return trs;
+    }
+
 }
+

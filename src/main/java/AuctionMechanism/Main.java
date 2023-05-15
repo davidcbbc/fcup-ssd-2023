@@ -75,7 +75,9 @@ public class Main {
 
         node2.mineBlock(wallet1);
         node1.broadcastTransaction(tr1);
+        node1.broadcastTransaction(tr1);
         node3.broadcastTransaction(tr3);
+
 
         /*
         System.out.println("##deppois da 1 e 3###");

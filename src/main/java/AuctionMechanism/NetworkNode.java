@@ -103,7 +103,7 @@ public class NetworkNode {
         // check if transaction is not already in the current lists
         //if ((!this.getPendingTransactions().contains(transaction)) &&  (!this.getMemPoolTransactions().contains(transaction))) {
         //PEDRO validar Transaction antes de incluir na memPool
-        if (transactionValid(transaction) && (!this.getMemPoolTransactions().contains(transaction))){
+        if (transactionValid(transaction) ){
             System.out.println(transaction.getAuctionedItem().getName() + " -> VERIFIED TRANSACTION");
         }else {
             System.out.println(transaction.getAuctionedItem().getName() + " -> UNVERIFIED TRANSACTION");

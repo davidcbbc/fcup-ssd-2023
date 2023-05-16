@@ -6,8 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="0511cc0a-ec84-45ef-b56b-b6be03500547" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Block.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Block.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Blockchain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Blockchain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AuctionMechanism/NetworkNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AuctionMechanism/NetworkNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/AuctionMechanism/Block.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/AuctionMechanism/Block.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/AuctionMechanism/Blockchain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/AuctionMechanism/Blockchain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/AuctionMechanism/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/AuctionMechanism/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/AuctionMechanism/NetworkNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/AuctionMechanism/NetworkNode.class" afterDir="false" />
     </list>
     <list id="1e17c222-0310-4ce4-9008-87f0ce93130c" name="Changes by pedro" comment="" />

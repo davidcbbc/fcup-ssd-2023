@@ -24,6 +24,14 @@ public class Block {
         this.hash = calculateHash();
     }
 
+    //for genesis Block
+    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, int gen_nounce, String gen_hash) {
+        this.transactions = transactions;
+        this.timestamp = timestamp;
+        this.previousBlockHash = previousBlockHash;
+        this.nonce = gen_nounce;;
+        this.hash = gen_hash;
+    }
     public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, User validator) {
         this.transactions = transactions;
         //System.out.println("CriaBloco2:" + this.toString() + " com este numero de transactions:" + this.transactions.size());

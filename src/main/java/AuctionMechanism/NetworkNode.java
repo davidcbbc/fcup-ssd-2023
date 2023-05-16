@@ -16,12 +16,12 @@ public class NetworkNode {
     private List<Transaction> mempoolTransactions;
     //private double stake;
 
-    public NetworkNode(Blockchain blockchain) {
-        this.blockchain = blockchain;
+    //public NetworkNode(Blockchain blockchain) {
+    public NetworkNode(int difficulty, boolean useProofOfStake) {
+        this.blockchain = new Blockchain(difficulty, useProofOfStake);
         this.peers = new ArrayList<>();
         //this.pendingTransactions = new ArrayList<>();
         this.mempoolTransactions = new ArrayList<>();
-
     }
 
     /*
@@ -144,7 +144,7 @@ public class NetworkNode {
     public void receiveBlock(Block block) {
         // check if block is not already in the blockchain and if it's valid
         //System.out.println(this.toString() + " Node.receiveBlock para o block: " + block.toString() + " vai validar se block é valido e não está na chain");
-        if (!(blockchain.getChain().contains(block) && blockchain.isValidBlock(blockchain.getLastBlock().getHash(), block))) {
+        if (!(blockchain.getChain().contains(block) && blockchain.isValidNewBlock(block, blockchain.getLastBlock()))) {
             //System.out.println(this.toString() + " Node.receiveBlock adiciona o bloco: " + block.toString());
             blockchain.addBlock(block);
             // remove transactions that were already included in the Block
@@ -153,13 +153,9 @@ public class NetworkNode {
                     mempoolTransactions.remove(tr);
                 }
             }
-            //for (Transaction tr : block.getTransactions()) {
-            //    if (pendingTransactions.contains(tr)) {
-            //        pendingTransactions.remove(tr);
-            //    }
-            //}
+
         }
-        else if (blockchain.isValidBlock(blockchain.getLastBlock().getHash(), block)){
+        else if (blockchain.isValidNewBlock(block, blockchain.getLastBlock())){
             //System.out.println(this.toString() + " Node.receiveBlock o bloco já estava na blockchain: " + block.toString());
             //if block is already in blockchain, remove the pendingTransactions
             if (blockchain.getChain().contains(block)) {
@@ -170,17 +166,14 @@ public class NetworkNode {
                         mempoolTransactions.remove(tr);
                     }
                 }
-                //System.out.println(this.toString() + " Node.receiveBlock vai remover as transações do bloco da pendingTransactions: " + block.toString());
-                //for (Transaction tr : block.getTransactions()) {
-                //    if (pendingTransactions.contains(tr)) {
-                //       pendingTransactions.remove(tr);
-                //    }
-                //}
+
             }
         }
         //Block is not valid, remove from blockchain PEDRO
         else if (blockchain.getChain().contains(block)) {
-            blockchain.getChain().remove(block);
+            //PEDRO123
+            //blockchain.getChain().remove(block);
+            System.out.println(this.toString() + " Node.receiveBlock received invalid Block: " + block.toString());
         }
     }
 
@@ -368,6 +361,25 @@ public class NetworkNode {
         // if transactions are not in the blockchain how can we get it here?
         trs.addAll(mempoolTransactions);
         return trs;
+    }
+
+    public void broadcastBlockchain() {
+        for (NetworkNode peer : this.peers) {
+            peer.receiveBlockchain(new ArrayList<>(this.blockchain.getChain()));
+        }
+    }
+
+    public void receiveBlockchain(List<Block> chain) {
+        // Validate the received chain
+        if (!blockchain.isChainValid(chain)) {
+            System.out.println("Received chain contains an invalid block. Ignoring.");
+            return;
+        }
+
+        // If the chain is valid and longer, replace the current chain
+        if (chain.size() > this.blockchain.getChain().size()) {
+            this.blockchain.replaceChain(chain);
+        }
     }
 
 }

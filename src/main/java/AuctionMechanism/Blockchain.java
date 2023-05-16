@@ -33,8 +33,9 @@ public class Blockchain {
     }
 
     private Block createGenesisBlock() {
-        return new Block(new ArrayList<Transaction>(),  new Date().getTime(),"0");
+        return new Block(new ArrayList<Transaction>(),  0,"0",99999, "kkdfkdfdskjfrhrerueieieif");
     }
+
 
     public void printBlockchain() {
 
@@ -52,7 +53,7 @@ public class Blockchain {
         count = 0;
         for(Transaction transaction : this.getAllTransactions())
         {
-            System.out.println("main.Blockchain.main.Blockchain: Dentro do getAllTransactions() ");
+            System.out.println("main.Blockchain.main.Blockchain: Dentro do getAllTransactions():" + transaction.toString());
             //transaction.printTransaction();
             count++;
         }
@@ -149,13 +150,14 @@ public class Blockchain {
       */
     }
 
+
     public boolean isValidBlock(String previousBlockHash, Block block) {
         String hash = block.calculateHash();
         String prefix = "0".repeat(this.difficulty);
         return block.getPreviousBlockHash().equals(previousBlockHash) && hash.substring(0, this.difficulty).equals(prefix);
     }
 
-    private boolean isValidNewBlock(Block newBlock, Block previousBlock) {
+    public boolean isValidNewBlock(Block newBlock, Block previousBlock) {
         // Check that the block's previous hash matches the hash of the last block
         if (!newBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
             //System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
@@ -175,13 +177,13 @@ public class Blockchain {
             //System.out.println(" isValidNewBlock: a ultima validação"  );
             return false;
         }
-
-        /* PEDRO Verify the transactions in the block
+        // PEDRO123 Verify the transactions in the block
         for (Transaction transaction : newBlock.getTransactions()) {
             if (!transaction.verifySignature()) {
+                System.out.println("A transaction in the block has an invalid signature");
                 return false;
             }
-        } */
+        }
 
         // All checks passed, so the block is valid
         return true;
@@ -205,10 +207,13 @@ public class Blockchain {
         return true;
     }
 */
-    public void replaceChain(List<Block> newChain) {
+    public boolean replaceChain(List<Block> newChain) {
         if (isChainLengthValid(newChain) && isChainValid(newChain)) {
             this.chain = newChain;
             //this.pendingTransactions = new ArrayList<Transaction>();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -476,7 +481,11 @@ public class Blockchain {
         return trs_output;
     }
 
+
     // TO CHECK: When an Auction is closed, we need to check if the buyer still has:
     //  an amount > minStakerequired to be in the Validators list
+
+
+
 
 }

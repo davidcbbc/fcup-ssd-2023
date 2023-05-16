@@ -18,14 +18,14 @@ public class Main {
 
         boolean useProofOfStake = false;
         // create a blockchain with a genesis block
-        Blockchain blockchain = new Blockchain(3, useProofOfStake);
+        //Blockchain blockchain = new Blockchain(3, useProofOfStake);
         // main.Blockchain.main.Blockchain.Block genesisBlock = new main.Blockchain.main.Blockchain.Block(new ArrayList<>(), 0,"0");
         //blockchain.addBlock(genesisBlock);
 
         // create three network nodes with the blockchain
-        NetworkNode node1 = new NetworkNode(blockchain);
-        NetworkNode node2 = new NetworkNode(blockchain);
-        NetworkNode node3 = new NetworkNode(blockchain);
+        NetworkNode node1 = new NetworkNode(3, useProofOfStake);
+        NetworkNode node2 = new NetworkNode(3, useProofOfStake);
+        NetworkNode node3 = new NetworkNode(3, useProofOfStake);
 
         // add each node to the other nodes' peer lists
         node1.addNode(node2);
@@ -65,18 +65,20 @@ public class Main {
         tr2.setSignature(wallet2.signTransaction(tr2.getHash()));
 
         Transaction tr3 = new Transaction(wallet1.getPublicKey(), item3);
-        tr3.setSignature(wallet2.signTransaction(tr3.getHash()));
+        tr3.setSignature(wallet1.signTransaction(tr3.getHash()));
 
         Transaction tr4 = new Transaction(wallet2.getPublicKey(), item4);
         tr4.setSignature(wallet2.signTransaction(tr4.getHash()));
 
         Transaction tr5 = new Transaction(wallet1.getPublicKey(), item5);
-        tr5.setSignature(wallet2.signTransaction(tr5.getHash()));
+        tr5.setSignature(wallet1.signTransaction(tr5.getHash()));
 
         node2.mineBlock(wallet1);
         node1.broadcastTransaction(tr1);
+        //node2.broadcastTransaction(tr4);
         node1.broadcastTransaction(tr1);
         node3.broadcastTransaction(tr3);
+        //node3.broadcastTransaction(tr2);
 
 
         /*
@@ -93,47 +95,40 @@ public class Main {
         node3.mineBlock(wallet1);
         node1.mineBlock(wallet2);
 
-        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());;
 
         node3.broadcastTransaction(tr2);
+        node3.mineBlock(wallet2);
         node2.broadcastTransaction(tr4);
 
         //System.out.println("##deppois da 2###");
 
-        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
 
         node1.mineBlock(wallet1);
 
-        node3.mineBlock(wallet2);
-
-        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
-
-        //node2.broadcastTransaction(tr4);
-
-        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
 
         node1.broadcastTransaction(tr5);
 
-        //System.out.println("Node:" + node1.toString() + " has this number of mempool connections: " + node1.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node2.toString() + " has this number of mempool connections: " + node2.getMemPoolTransactions().size());
-        //System.out.println("Node:" + node3.toString() + " has this number of mempool connections: " + node3.getMemPoolTransactions().size());
 
-        //node3.mineBlock(wallet2); // 5
-
-        //node1.mineBlock(wallet1); // 6
 
         node2.mineBlock(wallet1); // 7
 
-        blockchain.printBlockchain();
+        System.out.println("*******************************************************************************************");
+        System.out.println("Node:" + node1.toString() + " has this number of blocks in the blockchain: " + node1.getBlockchain().getChain().size());
+        System.out.println("Node:" + node1.toString() + " has this number of mempoolTransactions in the blockchain: " + node1.getMemPoolTransactions().size());
 
+        node1.getBlockchain().printBlockchain();
+
+        System.out.println("*******************************************************************************************");
+        System.out.println("Node:" + node2.toString() + " has this number of blocks in the blockchain: " + node2.getBlockchain().getChain().size());
+        System.out.println("Node:" + node2.toString() + " has this number of mempoolTransactions in the blockchain: " + node2.getMemPoolTransactions().size());
+
+        node2.getBlockchain().printBlockchain();
+
+        System.out.println("*******************************************************************************************");
+        System.out.println("Node:" + node3.toString() + " has this number of blocks in the blockchain: " + node3.getBlockchain().getChain().size());
+        System.out.println("Node:" + node3.toString() + " has this number of mempoolTransactions in the blockchain: " + node3.getMemPoolTransactions().size());
+
+        node3.getBlockchain().printBlockchain();
 
         /*
         Scanner in= new Scanner(System.in);

@@ -14,7 +14,7 @@ public class Client {
 
         KademliaNode kademliaNode = new KademliaNode("localhost",uid,8081,null);
 
-        kademliaNode.pingNode("localhost",8080);
+       // kademliaNode.pingNode("localhost",8080);
 
 
     }

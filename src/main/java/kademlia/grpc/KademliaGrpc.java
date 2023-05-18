@@ -35,7 +35,7 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
         Node sourceNode = request.getSender();
 
 
-        System.out.println("[+] [NODE PING MESSAGE] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
+        System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED PING] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
 
         PingResponse response = PingResponse.newBuilder()
                 .setSender(Node.newBuilder()

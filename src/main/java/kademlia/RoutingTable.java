@@ -46,7 +46,7 @@ public class RoutingTable {
         BigInteger distance = self.getId().xor(node.getId());
         int index = distance.bitLength() - 1;
 
-        return index < 0 ? 0 : index;
+        return Math.max(index, 0);
     }
 
     /**
@@ -58,7 +58,7 @@ public class RoutingTable {
         BigInteger distance = self.getId().xor(targetId);
         int index = distance.bitLength() - 1;
 
-        return index < 0 ? 0 : index;
+        return Math.max(index, 0);
     }
 
     /**

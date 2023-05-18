@@ -3,8 +3,6 @@ package kademlia;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import kademlia.grpc.GrpcHandler;
 import kademlia.grpc.KademliaGrpc;
 import kademlia.grpc.builders.KademliaServiceGrpc;
@@ -110,5 +108,9 @@ public class KademliaNode {
 
     public BigInteger getId() {
         return this.id;
+    }
+
+    public RoutingTable getRoutingTable() {
+        return routingTable;
     }
 }

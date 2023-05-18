@@ -1,8 +1,11 @@
-package Blockchain;
+package AuctionMechanism;
+
+import AuctionMechanism.TransactionTypes.Transaction;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Random;
 
 public class Block {
     private List<Transaction> transactions;
@@ -14,17 +17,27 @@ public class Block {
 
     public Block(List<Transaction> transactions, long timestamp, String previousBlockHash) {
         this.transactions = transactions;
+        //System.out.println("CriaBloco1:" + this.toString() + " com este numero de transactions:" + this.transactions.size());
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
-        this.nonce = 0;
+        this.nonce = new Random().nextInt(Integer.MAX_VALUE);;
         this.hash = calculateHash();
     }
 
-    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, User validator) {
+    //for genesis Block
+    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, int gen_nounce, String gen_hash) {
         this.transactions = transactions;
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
-        this.nonce = 0;
+        this.nonce = gen_nounce;;
+        this.hash = gen_hash;
+    }
+    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, User validator) {
+        this.transactions = transactions;
+        //System.out.println("CriaBloco2:" + this.toString() + " com este numero de transactions:" + this.transactions.size());
+        this.timestamp = timestamp;
+        this.previousBlockHash = previousBlockHash;
+        this.nonce = new Random().nextInt(Integer.MAX_VALUE);;
         this.hash = calculateHash();
         this.validator = validator;
     }
@@ -56,12 +69,12 @@ public class Block {
         System.out.println("main.Blockchain.main.Blockchain.Block:Timestamp: " + this.timestamp);
         System.out.println("main.Blockchain.main.Blockchain.Block:PreviousBlockHash " + this.previousBlockHash);
         System.out.println("main.Blockchain.main.Blockchain.Block:Hash " + this.hash);
-        System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
-        for(Transaction transaction : this.transactions)
-        {
-            transaction.printTransaction();
-        }
-        System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
+        //System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
+        //for(Transaction transaction : this.transactions)
+        //{
+            //transaction.printTransaction();
+        //}
+        //System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
         System.out.println("FIM_Block: " + this.toString());
     }
 
@@ -71,12 +84,13 @@ public class Block {
             nonce++;
             hash = calculateHash();
         }
-        System.out.println("main.Blockchain.main.Blockchain.Block mined! Nonce value: " + nonce);
-        for (Transaction transaction : this.transactions) {
-            transaction.execute();
-            System.out.println("main.Blockchain.Transaction: " + transaction.toString() + " executed!");
-            System.out.println("main.Blockchain.Transaction Amount: " + transaction.getAmount());
-        }
+
+        System.out.println(this.toString() + ": main.Blockchain.main.Blockchain.Block mined! Nonce value: " + nonce);
+        //for (Transaction transaction : this.transactions) {
+            //transaction.execute();
+        //    System.out.println("main.Blockchain.Transaction: " + transaction.toString() + " executed!");
+            //System.out.println("main.Blockchain.Transaction Amount: " + transaction.getAmount());
+        //}
     }
 
     public String calculateHash() {

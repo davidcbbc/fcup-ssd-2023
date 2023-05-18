@@ -1,4 +1,4 @@
-package Blockchain;
+package AuctionMechanism;
 
 import java.security.MessageDigest;
 

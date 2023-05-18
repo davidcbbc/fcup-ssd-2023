@@ -1,5 +1,6 @@
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import kademlia.KademliaNode;
 
 import java.math.BigInteger;
 
@@ -12,17 +13,9 @@ public class Main {
 
         System.out.println(uid.hashCode());
 
-        System.out.println("[+] Starting the server");
-        /*Server server = ServerBuilder.forPort(8080).addService(new HelloServiceImpl()).build();
 
-        try {
-            server.start();
-            server.awaitTermination();
-        } catch (Exception e) {
-            System.out.println("[-] Exception was made");
-            System.out.println(e.toString());
-        }*/
-
+        KademliaNode kademliaNode = new KademliaNode("localhost",uid,8080,null);
+        
 
     }
 }

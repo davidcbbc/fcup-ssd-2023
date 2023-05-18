@@ -23,7 +23,7 @@ public class Server {
         int port = 8080;
         System.out.println("[+] Starting Node on port " + port);
 
-        KademliaNode kademliaNode = new KademliaNode("localhost","1",port);
+        //KademliaNode kademliaNode = new KademliaNode("localhost",,port,null);
 
         /*while(true){
             try{

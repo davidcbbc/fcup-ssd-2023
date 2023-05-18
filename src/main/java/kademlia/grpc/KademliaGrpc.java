@@ -5,6 +5,12 @@ import io.grpc.stub.StreamObserver;
 import kademlia.KademliaNode;
 import kademlia.grpc.builders.*;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
 /**
  * Class that is responsible for implementing all GRPC functions.
  */
@@ -58,6 +64,30 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     @Override
     public void findNode(FindNodeRequest request, StreamObserver<FindNodeResponse> responseObserver) {
         super.findNode(request, responseObserver);
+        Node sourceNode = request.getSender();
+
+        System.out.println("[+] [NODE FIND NODE MESSAGE] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
+
+        BigInteger targetToFindNodeUid = new BigInteger(request.getTarget().toByteArray());
+
+        //find closest nodes
+        List<KademliaNode> closestNodes = this.kademliaNode.getRoutingTable().findClosestNodes(targetToFindNodeUid,3);
+
+        List<Node> nodes = new ArrayList<>();
+        // TODO: passar KademliaNode para Node
+
+        FindNodeResponse response = FindNodeResponse.newBuilder()
+                .setSender(Node.newBuilder()
+                        .setAddress(this.kademliaNode.getAddress())
+                        .setId(ByteString.copyFromUtf8(this.kademliaNode.getId().toString()))
+                        .setAddressBytes(ByteString.copyFromUtf8("asd")))
+                .addAllNodes(nodes)
+                .build();
+
+
+
+        // descobrir os nos mais pertos de um determinado no pela distancia das routing tables
+
     }
 
 
@@ -70,5 +100,6 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     @Override
     public void findValue(FindValueRequest request, StreamObserver<FindValueResponse> responseObserver) {
         super.findValue(request, responseObserver);
+        // a mesma coiusa que o findNode , mas é para encrontrar valores de key-value
     }
 }

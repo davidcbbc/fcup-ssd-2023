@@ -2,6 +2,7 @@ package kademlia;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class RoutingTable {
@@ -88,7 +89,7 @@ public class RoutingTable {
             }
         }
 
-        closestNodes.sort((a, b) -> a.getId().xor(targetId).compareTo(b.getId().xor(targetId)));
+        closestNodes.sort(Comparator.comparing(a -> a.getId().xor(targetId)));
 
         return closestNodes.subList(0, Math.min(numResults, closestNodes.size()));
     }

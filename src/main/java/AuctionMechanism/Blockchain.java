@@ -7,11 +7,12 @@ import AuctionMechanism.TransactionTypes.Transaction;
 import AuctionMechanism.Wallet.Wallet;
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Blockchain {
+public class Blockchain implements Serializable {
     private List<Block> chain;
     private int difficulty;
     private List<BidAuctionTransaction> maxBids;

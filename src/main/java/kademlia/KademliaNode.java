@@ -1,5 +1,7 @@
 package kademlia;
 
+import AuctionMechanism.Blockchain;
+import AuctionMechanism.TransactionTypes.Transaction;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -12,17 +14,19 @@ import kademlia.grpc.builders.PingResponse;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KademliaNode {
 
     private final String address;
     private final int port;
-    private final BigInteger id; //TODO create uid with 180 bits instead of string
+    private final BigInteger id;
     private final GrpcHandler grpcHandler;
-
     private final PublicKey publicKey;
-
     private RoutingTable routingTable;
+    private Blockchain blockchain;
+    private List<Transaction> mempoolTransactions;
 
 
     public KademliaNode(String address, BigInteger id, int port, PublicKey publicKey) {
@@ -32,6 +36,8 @@ public class KademliaNode {
         this.port = port;
         this.publicKey=publicKey;
         this.routingTable = new RoutingTable(this);
+        //this.blockchain = new Blockchain(3,true); TODO: ir buscar a blockchain
+        this.mempoolTransactions = new ArrayList<>(); // init empty mempool
         // start the grpc handler (server) for the grpc methods (PING , FIND_NODE , etc ...)
         this.grpcHandler = new GrpcHandler(this.port,new KademliaGrpc(this));
         this.grpcHandler.start(); // start handler thread
@@ -112,5 +118,13 @@ public class KademliaNode {
 
     public RoutingTable getRoutingTable() {
         return routingTable;
+    }
+
+    public Blockchain getBlockchain() {
+        return blockchain;
+    }
+
+    public List<Transaction> getMempoolTransactions() {
+        return mempoolTransactions;
     }
 }

@@ -1,10 +1,13 @@
 package kademlia.grpc;
 
+import AuctionMechanism.Block;
+import AuctionMechanism.Blockchain;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import kademlia.KademliaNode;
 import kademlia.grpc.builders.*;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +57,18 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     @Override
     public void store(StoreRequest request, StreamObserver<StoreResponse> responseObserver) {
         super.store(request, responseObserver);
+        // deserialize the block
+        byte[] blockBytes = request.getValue().toByteArray();
+        Block newBlock = null;
+        try {
+               ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(blockBytes));
+                newBlock = (Block) ois.readObject();
+        } catch (Exception e) {
+            System.out.println("[-] Exception reading bytes from Block chain");
+        }
+        //adds the block to the current blockchain
+        this.kademliaNode.getBlockchain().addBlock(newBlock);
+
     }
 
     /**
@@ -101,5 +116,38 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     public void findValue(FindValueRequest request, StreamObserver<FindValueResponse> responseObserver) {
         super.findValue(request, responseObserver);
         // a mesma coiusa que o findNode , mas é para encrontrar valores de key-value
+        // usado para pedir a blockchain toda ou outros valores
+
+        Node sourceNode = request.getSender();
+        System.out.println("[+] [FIND VALUE MESSAGE] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
+
+        String key = request.getKey().toString();
+
+        // if the node wants to get full blockchain - new joiner
+        if (key.equals("BLOCKCHAIN")){
+            Blockchain blockchain = this.kademliaNode.getBlockchain();
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutput out = new ObjectOutputStream(bos);
+                out.writeObject(blockchain);
+                out.flush();
+            } catch (Exception e) {
+                System.out.println("[-] Exception on serializing the Blockchain");
+            }
+
+            byte[] blockchainBytes = bos.toByteArray();
+            FindValueResponse findValueResponse = FindValueResponse.newBuilder()
+                    .setValue(ByteString.copyFrom(blockchainBytes))
+                    .setSender(Node.newBuilder()
+                            .setAddress(this.kademliaNode.getAddress())
+                            .setId(ByteString.copyFromUtf8(this.kademliaNode.getId().toString()))
+                            .setAddressBytes(ByteString.copyFromUtf8("asd")))
+                    .build();
+
+            responseObserver.onNext(findValueResponse);
+            responseObserver.onCompleted();
+        }
+
     }
 }

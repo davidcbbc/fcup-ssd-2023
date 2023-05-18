@@ -1,6 +1,6 @@
 syntax = "proto3";
 option java_multiple_files = true;
-package kademlia.grpc;
+package kademlia.grpc.builders;
 
 
 service KademliaService {

@@ -5,10 +5,12 @@ import AuctionMechanism.Blockchain;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import kademlia.KademliaNode;
+import kademlia.Util;
 import kademlia.grpc.builders.*;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +36,8 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
     public void ping(PingRequest request, StreamObserver<PingResponse> responseObserver) {
         Node sourceNode = request.getSender();
 
-
-        System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED PING] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
+        // received a ping
+        System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED PING FROM " + sourceNode.getAddress() + "]");
 
         PingResponse response = PingResponse.newBuilder()
                 .setSender(Node.newBuilder()
@@ -45,6 +47,9 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+
+        // adds the node to the routing table
+        this.addNodeToRoutingTable(sourceNode);
     }
 
 
@@ -119,9 +124,9 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
         // usado para pedir a blockchain toda ou outros valores
 
         Node sourceNode = request.getSender();
-        System.out.println("[+] [FIND VALUE MESSAGE] | IP: " + sourceNode.getAddress() + " | ID: " + sourceNode.getId());
+        System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED FIND VALUE FROM "+sourceNode.getAddress()+"] | KEY: " + request.getKey());
 
-        String key = request.getKey().toString();
+        String key = new String(request.getKey().toByteArray());
 
         // if the node wants to get full blockchain - new joiner
         if (key.equals("BLOCKCHAIN")){
@@ -142,12 +147,29 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase{
                     .setSender(Node.newBuilder()
                             .setAddress(this.kademliaNode.getAddress())
                             .setId(ByteString.copyFromUtf8(this.kademliaNode.getId().toString()))
-                            .setAddressBytes(ByteString.copyFromUtf8("asd")))
+                            .setAddressBytes(ByteString.copyFromUtf8(this.kademliaNode.getAddress())))
                     .build();
 
+            System.out.println("sending blockchain");
             responseObserver.onNext(findValueResponse);
             responseObserver.onCompleted();
         }
 
+    }
+
+    /**
+     * Adds a source node to the routing table if it was not added previously
+     * @param sourceNode Source node to add to the routing table
+     */
+    private void addNodeToRoutingTable(Node sourceNode){
+        String address = sourceNode.getAddress();
+        String ip = address.split(":")[0];
+        int port = Integer.parseInt(address.split(":")[1]);
+        BigInteger id =  new BigInteger(sourceNode.getId().toByteArray());
+        PublicKey publicKey = Util.stringToPublicKey(sourceNode.getPubKey());
+        // update RoutingTable if node that pinged
+        KademliaNode newKademliaNode = new KademliaNode(ip,id,port,publicKey);
+        //System.out.println("Updating routing table with id " + id.toString());
+        this.kademliaNode.getRoutingTable().update(newKademliaNode);
     }
 }

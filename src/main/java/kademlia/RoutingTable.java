@@ -94,5 +94,16 @@ public class RoutingTable {
         return closestNodes.subList(0, Math.min(numResults, closestNodes.size()));
     }
 
+    /**
+     * Returns the amount of nodes stored in the buckets
+     * @return
+     */
+    public int getNodeCount() {
+        int nodeCount = 0;
+        for (Bucket bucket : this.buckets) {
+            nodeCount += bucket.getNodes().size();
+        }
+        return nodeCount;
+    }
 
 }

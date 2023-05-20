@@ -22,12 +22,13 @@ public class Main {
         Thread.sleep(1000); // sleep to wait until the node start the listener
 
         kademliaNode1.getRoutingTable().update(kademliaNode2);
+        kademliaNode2.getRoutingTable().update(kademliaNode1);
         //kademliaNode1.getRoutingTable().update(kademliaNode3);
 
-        //kademliaNode2.getRoutingTable().update(kademliaNode1);
-        kademliaNode2.getRoutingTable().update(kademliaNode3);
+        kademliaNode1.getRoutingTable().update(kademliaNode3);
+        kademliaNode3.getRoutingTable().update(kademliaNode1);
 
-        kademliaNode3.getRoutingTable().update(kademliaNode2);
+        //kademliaNode3.getRoutingTable().update(kademliaNode2);
         //kademliaNode3.getRoutingTable().update(kademliaNode1);
 
 
@@ -38,6 +39,17 @@ public class Main {
 
         //System.out.println(kademliaNode1.getRoutingTable().getNodeCount());
         kademliaNode4.joinNetwork("localhost",8080,kademliaNode1.getId(),kademliaNode1.getWallet().getPublicKey());
+
+        System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
+        Thread.sleep(3000);
+        System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
+        System.out.println(kademliaNode4.getRoutingTable());
+
+
+
+
+
+        //kademliaNode4.store(kademliaNode2);
         //System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
         //System.out.println(kademliaNode4.getRoutingTable().findClosestNodes(kademliaNode3.getId(),2));
         //System.out.println(kademliaNode1.getRoutingTable().getNodeCount());

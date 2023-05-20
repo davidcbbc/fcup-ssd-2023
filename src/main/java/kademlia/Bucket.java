@@ -1,10 +1,11 @@
 package kademlia;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Bucket {
+public class Bucket implements Serializable {
 
     private static final int MAX_SIZE = 20;
     private LinkedList<KademliaNode> nodes;
@@ -33,6 +34,10 @@ public class Bucket {
 
     public synchronized List<KademliaNode> getNodes(){
         return new ArrayList<>(this.nodes);
+    }
+
+    public boolean removeNode(KademliaNode target) {
+        return nodes.removeIf(node -> node.getId().equals(target.getId()));
     }
 
 

@@ -7,19 +7,19 @@ import AuctionMechanism.Wallet.Wallet;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import kademlia.grpc.GrpcHandler;
 import kademlia.grpc.KademliaGrpc;
 import kademlia.grpc.builders.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-public class KademliaNode {
+public class KademliaNode implements Serializable{
 
     private final String address;
     private final int port;
@@ -149,10 +149,85 @@ public class KademliaNode {
         KademliaNode kademliaNode = new KademliaNode(ip,id,port,publicKey);
         this.routingTable.update(kademliaNode);
         System.out.println("[+] ["+this.port+"] Successfully entered the network :)");
-        System.out.println("[+] ["+this.port+"] Requesting for a blockchain copy");
+        //System.out.println("[+] ["+this.port+"] Requesting for a blockchain copy");
         // request for a copy of the blockchain
-        this.getBlockchainCopy(kademliaNode);
+        //this.getBlockchainCopy(kademliaNode);
     }
+
+
+    public void store(KademliaNode kademliaNode, String key){
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(kademliaNode.getAddress(), kademliaNode.getPort())
+                .usePlaintext()
+                .build();
+
+        KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
+
+
+        if(key.equals("BLOCKCHAIN")) {
+            Blockchain blockchain = this.getBlockchain();
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutput out = new ObjectOutputStream(bos);
+                out.writeObject(blockchain);
+                out.flush();
+            } catch (Exception e) {
+                System.out.println("[-] Exception on serializing the Blockchain");
+            }
+            byte[] blockchainBytes = bos.toByteArray();
+
+            try{
+                StoreResponse storeResponse = stub.store(StoreRequest.newBuilder()
+                        .setSender(Node.newBuilder()
+                                .setAddress(this.address+":"+this.port)
+                                .setId(ByteString.copyFrom(this.id.toByteArray()))
+                                .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded()))
+                                .build())
+                        .setKey(ByteString.copyFromUtf8(key))
+                        .setValue(ByteString.copyFrom(blockchainBytes))
+                        .build());
+            } catch (Exception e) {
+                System.out.println("[-] IGNORE : " + e.toString());
+            }
+
+            System.out.println("[+] ["+this.port+"] [BLOCKCHAIN STORE SENT]");
+            // sending ping
+            channel.shutdown();
+        }
+
+        if (key.equals("ROUTING_TABLE")){
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutput out = new ObjectOutputStream(bos);
+                out.writeObject(this.routingTable.getBuckets());
+                out.flush();
+            } catch (Exception e) {
+                System.out.println("[-] Exception on serializing the RoutingTable Buckets");
+            }
+            byte[] routingTableBytes = bos.toByteArray();
+
+            try{
+                StoreResponse storeResponse = stub.store(StoreRequest.newBuilder()
+                        .setSender(Node.newBuilder()
+                                .setAddress(this.address+":"+this.port)
+                                .setId(ByteString.copyFrom(this.id.toByteArray()))
+                                .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded()))
+                                .build())
+                        .setKey(ByteString.copyFromUtf8(key))
+                        .setValue(ByteString.copyFrom(routingTableBytes))
+                        .build());
+            } catch (Exception e) {
+                System.out.println("[-] IGNORE : " + e.toString());
+            }
+
+            System.out.println("[+] ["+this.port+"] [ROUTING TABLE STORE SENT]");
+            // sending ping
+            channel.shutdown();
+        }
+    }
+
+
 
     /**
      * Requests a blockchain copy from a KademliaNode
@@ -255,5 +330,11 @@ public class KademliaNode {
         return wallet;
     }
 
+    public void setBlockchain(Blockchain blockchain) {
+        this.blockchain = blockchain;
+    }
 
+    public void setRoutingTable(List<Bucket> buckets) {
+        this.routingTable.setBuckets(buckets);
+    }
 }

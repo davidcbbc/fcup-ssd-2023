@@ -2,6 +2,7 @@ package kademlia.grpc;
 
 import AuctionMechanism.Block;
 import AuctionMechanism.Blockchain;
+import AuctionMechanism.TransactionTypes.Transaction;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import kademlia.Bucket;
@@ -104,6 +105,43 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase im
             this.kademliaNode.setRoutingTable(buckets); // replace routing table with the one received
             this.kademliaNode.getRoutingTable().update(this.getKademliaNodeFromNode(sourceNode)); // adds the contacted node to the routing table
             boolean removed = this.kademliaNode.getRoutingTable().remove(this.kademliaNode); // removes itself from routing table
+        }
+
+
+        if(key.equals("TRANSACTION")) {
+            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED STORE TRANSACTION FROM " + sourceNode.getAddress() + "]");
+            byte[] transactionBytes = request.getValue().toByteArray();
+            Transaction transaction = null;
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(transactionBytes));
+                transaction = (Transaction) ois.readObject();
+            } catch (Exception e) {
+                System.out.println("[-] Exception reading bytes from Transaction " + e.toString());
+            }
+            if (transaction != null){
+                System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED TRANSACTION!]");
+                if (this.kademliaNode.isTransactionValid(transaction) && !this.kademliaNode.getMempoolTransactions().contains(transaction)){
+                    // if transaction is valid and not present in the mempool
+                    this.kademliaNode.getMempoolTransactions().add(transaction);
+                }
+                return;
+            }
+            System.out.println("[-] Transaction is null , returning");
+        }
+
+        if (key.equals("BLOCK")) {
+            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [RECEIVED STORE BLOCK FROM " + sourceNode.getAddress() + "]");
+            byte[] blockBytes = request.getValue().toByteArray();
+            Block block = null;
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(blockBytes));
+                block = (Block) ois.readObject();
+            } catch (Exception e) {
+                System.out.println("[-] Exception reading bytes from Block " + e.toString());
+            }
+            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [ADDING BLOCK TO BLOCKCHAIN]");
+            this.kademliaNode.getBlockchain().addBlock(block);
+
         }
 
 
@@ -226,11 +264,11 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase im
     private void sendBlockchain(Node sourceNode){
         KademliaNode kademliaNode1 = this.getKademliaNodeFromNode(sourceNode);
         System.out.println("[+] ["+this.kademliaNode.getPort()+"] SENDING COPY OF BLOCKCHAIN TO " + kademliaNode1.getPort());
-        this.kademliaNode.store(kademliaNode1,"BLOCKCHAIN");
+        this.kademliaNode.store(kademliaNode1,"BLOCKCHAIN",null,null);
     }
 
     private void sendRoutingTable(Node sourceNode){
         KademliaNode newKademliaNode = this.getKademliaNodeFromNode(sourceNode);
-        this.kademliaNode.store(newKademliaNode,"ROUTING_TABLE");
+        this.kademliaNode.store(newKademliaNode,"ROUTING_TABLE",null,null);
     }
 }

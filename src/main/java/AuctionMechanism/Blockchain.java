@@ -84,16 +84,16 @@ public class Blockchain implements Serializable {
     //}
 
 
-/*
-    public main.Blockchain.main.Blockchain.Block mineBlock(List<main.Blockchain.Transaction> pendingTransactions, main.Blockchain.User miner) {
-        List<main.Blockchain.Transaction> transactions = new ArrayList<>();
-        transactions.addAll(pendingTransactions); //Adicionar ao current_transaction? PEDRO
-        //transactions.add(main.Blockchain.Transaction.rewardTransaction(miner.getAddress()));
-        main.Blockchain.main.Blockchain.Block block = new main.Blockchain.main.Blockchain.Block(transactions, 0, this.getLastBlock().getHash());
-        block.mineBlock(this.difficulty);
-        return block;
-    }
-*/
+    /*
+        public main.Blockchain.main.Blockchain.Block mineBlock(List<main.Blockchain.Transaction> pendingTransactions, main.Blockchain.User miner) {
+            List<main.Blockchain.Transaction> transactions = new ArrayList<>();
+            transactions.addAll(pendingTransactions); //Adicionar ao current_transaction? PEDRO
+            //transactions.add(main.Blockchain.Transaction.rewardTransaction(miner.getAddress()));
+            main.Blockchain.main.Blockchain.Block block = new main.Blockchain.main.Blockchain.Block(transactions, 0, this.getLastBlock().getHash());
+            block.mineBlock(this.difficulty);
+            return block;
+        }
+    */
     // With Proof of Stake
     public Block mineBlock(List<Transaction> mempoolTransactions, Wallet wallet) {
 
@@ -242,7 +242,7 @@ public class Blockchain implements Serializable {
         return true;
     }
 
-    public boolean addBlock(Block block) {
+    public void addBlock(Block block) {
         //System.out.println(this.toString() + " Blockchain.addBlock vai validar se é valido: " + block.toString());
         //System.out.println("Vai percorrer a blockchain:");
         //printBlockchain();
@@ -251,10 +251,8 @@ public class Blockchain implements Serializable {
         if (isValidNewBlock(block, this.getLastBlock())) {
             //System.out.println(this.toString() + " Blockchain.addBlock adicionou bloco valido com sucesso: " + block.toString());
             this.chain.add(block);
-            return true;
         } else {
             System.out.println(this.toString() + " Blockchain.addBlock Attempted to add invalid block to blockchain: " + block.toString());
-            return false;
         }
     }
 

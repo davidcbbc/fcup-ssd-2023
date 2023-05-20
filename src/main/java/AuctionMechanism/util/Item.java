@@ -1,6 +1,8 @@
 package AuctionMechanism.util;
 
-public class Item {
+import java.io.Serializable;
+
+public class Item implements Serializable {
     private static int idCounter = 0; // This counter will increment with each new Item
     private int id;
     private String Name;

@@ -1,37 +1,51 @@
 package kademlia;
 
+import AuctionMechanism.Block;
+import AuctionMechanism.Blockchain;
+import AuctionMechanism.TransactionTypes.Transaction;
+import AuctionMechanism.Wallet.Wallet;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import kademlia.grpc.GrpcHandler;
 import kademlia.grpc.KademliaGrpc;
-import kademlia.grpc.builders.KademliaServiceGrpc;
-import kademlia.grpc.builders.Node;
-import kademlia.grpc.builders.PingRequest;
-import kademlia.grpc.builders.PingResponse;
+import kademlia.grpc.builders.*;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
-public class KademliaNode {
+public class KademliaNode implements Serializable{
 
     private final String address;
     private final int port;
-    private final BigInteger id; //TODO create uid with 180 bits instead of string
+    private final BigInteger id;
     private final GrpcHandler grpcHandler;
-
-    private final PublicKey publicKey;
-
     private RoutingTable routingTable;
+    private Blockchain blockchain;
+    private List<Transaction> mempoolTransactions;
+    private Wallet wallet;
 
 
-    public KademliaNode(String address, BigInteger id, int port, PublicKey publicKey) {
+    /**
+     * Constructor to start a node w/ listener
+     * @param address Address of the Node
+     * @param id BigInteger of the Node
+     * @param port Port of the Node
+     */
+    public KademliaNode(String address, BigInteger id, int port) {
         // set the attributes
         this.address = address;
-        this.id = id; // TODO check if uid is already taken
+        this.id = id;
         this.port = port;
-        this.publicKey=publicKey;
         this.routingTable = new RoutingTable(this);
+        this.blockchain = new Blockchain(10,true);
+        this.wallet = new Wallet();
+        this.mempoolTransactions = new ArrayList<>(); // init empty mempool
         // start the grpc handler (server) for the grpc methods (PING , FIND_NODE , etc ...)
         this.grpcHandler = new GrpcHandler(this.port,new KademliaGrpc(this));
         this.grpcHandler.start(); // start handler thread
@@ -39,30 +53,220 @@ public class KademliaNode {
 
 
     /**
-     * Probes a node to see if it's online.
-     * @param address of the node to be pinged
-     * @param port of the node to be pinged
+     * Constructor to create a node without GrpcHandler and Blockchain
+     * @param address Address of the Node
+     * @param id BigInteger of the Node
+     * @param port Port of the Node
+     * @param publicKey Public Key of the node
      */
-    public void pingNode(String address, int port){
-        System.out.println("[+] PINGING NODE WITH IP " + address);
+    public KademliaNode(String address, BigInteger id, int port, PublicKey publicKey){
+        this.address=address;
+        this.id=id;
+        this.port=port;
+        this.wallet = new Wallet();
+        this.wallet.setPublicKey(publicKey);
+        this.grpcHandler=null;
+    }
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(address,port)
+
+    /**
+     * Probes a node to see if it's online.
+     * @param kademliaNode node to ping
+     */
+    public void pingNode(KademliaNode kademliaNode){
+        try{
+            this.ping(kademliaNode.getAddress(), kademliaNode.getPort());
+        } catch (Exception e) {
+            System.out.println("[-] Could not ping the provided host due to: " + e.toString());
+        }
+
+    }
+
+    public void pingNode(String ip, int port){
+        try{
+            this.ping(ip,port);
+        } catch (Exception e) {
+            System.out.println("[-] Could not ping the provided host due to: " + e.toString());
+        }
+
+    }
+
+    /**
+     * Probes a node to see if it's online. Uses the GRPC function
+     * @param ip Ip of the node
+     * @param port Port of the node
+     */
+    private void ping(String ip, int port) throws Exception{
+        System.out.println("[+] ["+this.port+"] PINGING NODE WITH IP " + ip + " AND PORT " + port);
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(ip, port)
                 .usePlaintext()
                 .build();
 
         KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
 
-        // sending ping
+        //sending ping
         PingResponse pingResponse = stub.ping(PingRequest.newBuilder()
-                        .setSender(Node.newBuilder()
-                                .setAddress(this.address)
-                                .setId(ByteString.copyFromUtf8(this.id.toString())).build())
+                .setSender(Node.newBuilder()
+                        .setAddress(this.address+":"+this.port)
+                        .setId(ByteString.copyFrom(this.id.toByteArray()))
+                        .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded())).build())
                 .build());
-
+        //pingResponse.isInitialized()
         // ping received
-        System.out.println("[+] PING REPLY RECEIVED , NODE UID : " + pingResponse.getSender().getId());
+        System.out.println("[+] ["+this.port+"] [PING REPLY RECEIVED]");
 
+        // sending ping
         channel.shutdown();
+    }
+
+
+
+    /**
+     * This function broadcasts a block in the blockchain
+     * @param block Block to be broadcasted
+     */
+    public void broadcastBlock(Block block){
+
+        // TODO
+    }
+
+    /**
+     * Joins the network by entering the IP and port of an already known Node
+     * @param ip Ip of the known Node
+     * @param port Port of the known Node
+     */
+    public void joinNetwork(String ip, int port, BigInteger id, PublicKey publicKey){
+        System.out.println("[+] ["+this.port+"] Trying to enter network with entering Node "+ip+":"+port);
+        // check if node is online
+        try{
+            this.ping(ip,port);
+        } catch (Exception e) {
+            System.out.println("[-] Could not ping the provided node due to: " + e.toString());
+            return;
+        }
+        // after checking that the node is online, add to the RoutingTable
+        KademliaNode kademliaNode = new KademliaNode(ip,id,port,publicKey);
+        this.routingTable.update(kademliaNode);
+        System.out.println("[+] ["+this.port+"] Successfully entered the network :)");
+        //System.out.println("[+] ["+this.port+"] Requesting for a blockchain copy");
+        // request for a copy of the blockchain
+        //this.getBlockchainCopy(kademliaNode);
+    }
+
+
+    public void store(KademliaNode kademliaNode, String key){
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(kademliaNode.getAddress(), kademliaNode.getPort())
+                .usePlaintext()
+                .build();
+
+        KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
+
+
+        if(key.equals("BLOCKCHAIN")) {
+            Blockchain blockchain = this.getBlockchain();
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutput out = new ObjectOutputStream(bos);
+                out.writeObject(blockchain);
+                out.flush();
+            } catch (Exception e) {
+                System.out.println("[-] Exception on serializing the Blockchain");
+            }
+            byte[] blockchainBytes = bos.toByteArray();
+
+            try{
+                StoreResponse storeResponse = stub.store(StoreRequest.newBuilder()
+                        .setSender(Node.newBuilder()
+                                .setAddress(this.address+":"+this.port)
+                                .setId(ByteString.copyFrom(this.id.toByteArray()))
+                                .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded()))
+                                .build())
+                        .setKey(ByteString.copyFromUtf8(key))
+                        .setValue(ByteString.copyFrom(blockchainBytes))
+                        .build());
+            } catch (Exception e) {
+                System.out.println("[-] IGNORE : " + e.toString());
+            }
+
+            System.out.println("[+] ["+this.port+"] [BLOCKCHAIN STORE SENT]");
+            // sending ping
+            channel.shutdown();
+        }
+
+        if (key.equals("ROUTING_TABLE")){
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try {
+                ObjectOutput out = new ObjectOutputStream(bos);
+                out.writeObject(this.routingTable.getBuckets());
+                out.flush();
+            } catch (Exception e) {
+                System.out.println("[-] Exception on serializing the RoutingTable Buckets");
+            }
+            byte[] routingTableBytes = bos.toByteArray();
+
+            try{
+                StoreResponse storeResponse = stub.store(StoreRequest.newBuilder()
+                        .setSender(Node.newBuilder()
+                                .setAddress(this.address+":"+this.port)
+                                .setId(ByteString.copyFrom(this.id.toByteArray()))
+                                .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded()))
+                                .build())
+                        .setKey(ByteString.copyFromUtf8(key))
+                        .setValue(ByteString.copyFrom(routingTableBytes))
+                        .build());
+            } catch (Exception e) {
+                System.out.println("[-] IGNORE : " + e.toString());
+            }
+
+            System.out.println("[+] ["+this.port+"] [ROUTING TABLE STORE SENT]");
+            // sending ping
+            channel.shutdown();
+        }
+    }
+
+
+
+    /**
+     * Requests a blockchain copy from a KademliaNode
+     * @param kademliaNode KademliaNode to request the blockchain from
+     */
+    public void getBlockchainCopy(KademliaNode kademliaNode){
+        System.out.println("[+] ["+this.port+"] REQUESTING BLOCKCHAIN ON PORT " + kademliaNode.getPort());
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(kademliaNode.getAddress(), kademliaNode.getPort())
+                .usePlaintext()
+                .build();
+
+        KademliaServiceGrpc.KademliaServiceBlockingStub stub = KademliaServiceGrpc.newBlockingStub(channel);
+
+
+        //sending find value
+        FindValueResponse findValueResponse = stub.findValue(FindValueRequest.newBuilder()
+                .setSender(Node.newBuilder()
+                        .setAddress(this.address+":"+this.port)
+                        .setId(ByteString.copyFrom(this.id.toByteArray()))
+                        .setPubKey(Base64.getEncoder().encodeToString(this.wallet.getPublicKey().getEncoded())).build())
+                .setKey(ByteString.copyFromUtf8("BLOCKCHAIN")).build());
+
+        System.out.println("asd");
+        byte[] blockchainReceived = findValueResponse.getValue().toByteArray();
+        try{
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(blockchainReceived));
+            Blockchain blockchainClone = (Blockchain) ois.readObject();
+            this.blockchain = blockchainClone;
+            System.out.println("[+] ["+this.port+"] [BLOCKCHAIN RECEIVED]");
+        } catch (Exception e){
+            System.out.println("[-] Exception while deserializing the Blockchain , no Blockchain received");
+            System.out.println(e.toString());
+        }
+
+        // sending ping
+        channel.shutdown();
+
+
     }
 
     /**
@@ -112,5 +316,25 @@ public class KademliaNode {
 
     public RoutingTable getRoutingTable() {
         return routingTable;
+    }
+
+    public Blockchain getBlockchain() {
+        return blockchain;
+    }
+
+    public List<Transaction> getMempoolTransactions() {
+        return mempoolTransactions;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public void setBlockchain(Blockchain blockchain) {
+        this.blockchain = blockchain;
+    }
+
+    public void setRoutingTable(List<Bucket> buckets) {
+        this.routingTable.setBuckets(buckets);
     }
 }

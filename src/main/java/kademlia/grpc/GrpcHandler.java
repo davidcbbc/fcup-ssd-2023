@@ -2,10 +2,12 @@ package kademlia.grpc;
 
 import io.grpc.ServerBuilder;
 
+import java.io.Serializable;
+
 /**
  * This class starts the listeners for all the GRPC methods implemented in KademliaGrpc class
  */
-public class GrpcHandler extends Thread{
+public class GrpcHandler extends Thread implements Serializable {
 
     private final int port;
     private final KademliaGrpc kademliaGrpc;

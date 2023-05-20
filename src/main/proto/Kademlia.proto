@@ -48,7 +48,6 @@ message FindValueRequest {
 message FindValueResponse {
   Node sender = 1;
   bytes value = 2;
-  repeated Node nodes = 3;
 }
 
 message Node {

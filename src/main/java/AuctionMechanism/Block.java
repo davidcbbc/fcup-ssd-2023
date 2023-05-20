@@ -2,12 +2,13 @@ package AuctionMechanism;
 
 import AuctionMechanism.TransactionTypes.Transaction;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Random;
 
-public class Block {
+public class Block implements Serializable {
     private List<Transaction> transactions;
     private long timestamp;
     private String previousBlockHash;

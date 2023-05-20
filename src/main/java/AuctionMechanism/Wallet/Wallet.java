@@ -22,7 +22,7 @@ import java.util.Date;
 import javax.security.auth.x500.X500Principal;
 import java.security.cert.X509Certificate;
 
-public class Wallet {
+public class Wallet implements Serializable{
     private PublicKey publicKey;
     private PrivateKey privateKey;
     private float initial_balance;

@@ -2,13 +2,14 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-public class Transaction {
+public class Transaction implements Serializable {
 
     private PublicKey sellerPublicKey;
     private Item auctionedItem;

@@ -7,11 +7,12 @@ import AuctionMechanism.TransactionTypes.Transaction;
 import AuctionMechanism.Wallet.Wallet;
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Blockchain {
+public class Blockchain implements Serializable {
     private List<Block> chain;
     private int difficulty;
     private List<BidAuctionTransaction> maxBids;
@@ -241,7 +242,7 @@ public class Blockchain {
         return true;
     }
 
-    public void addBlock(Block block) {
+    public boolean addBlock(Block block) {
         //System.out.println(this.toString() + " Blockchain.addBlock vai validar se é valido: " + block.toString());
         //System.out.println("Vai percorrer a blockchain:");
         //printBlockchain();
@@ -250,8 +251,10 @@ public class Blockchain {
         if (isValidNewBlock(block, this.getLastBlock())) {
             //System.out.println(this.toString() + " Blockchain.addBlock adicionou bloco valido com sucesso: " + block.toString());
             this.chain.add(block);
+            return true;
         } else {
             System.out.println(this.toString() + " Blockchain.addBlock Attempted to add invalid block to blockchain: " + block.toString());
+            return false;
         }
     }
 

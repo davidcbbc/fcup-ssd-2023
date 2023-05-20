@@ -1,11 +1,12 @@
 package kademlia;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class RoutingTable {
+public class RoutingTable implements Serializable {
 
     private final KademliaNode self;
 
@@ -46,7 +47,7 @@ public class RoutingTable {
         BigInteger distance = self.getId().xor(node.getId());
         int index = distance.bitLength() - 1;
 
-        return index < 0 ? 0 : index;
+        return Math.max(index, 0);
     }
 
     /**
@@ -58,7 +59,7 @@ public class RoutingTable {
         BigInteger distance = self.getId().xor(targetId);
         int index = distance.bitLength() - 1;
 
-        return index < 0 ? 0 : index;
+        return Math.max(index, 0);
     }
 
     /**
@@ -94,5 +95,35 @@ public class RoutingTable {
         return closestNodes.subList(0, Math.min(numResults, closestNodes.size()));
     }
 
+    public boolean remove(KademliaNode target) {
+        BigInteger targetId = target.getId();
+        int bucketIndex = this.getBucketIndex(targetId);
 
+        if(bucketIndex >= 0 && bucketIndex < buckets.size()){
+            Bucket bucket = buckets.get(bucketIndex);
+            return bucket.removeNode(target);
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the amount of nodes stored in the buckets
+     * @return
+     */
+    public int getNodeCount() {
+        int nodeCount = 0;
+        for (Bucket bucket : this.buckets) {
+            nodeCount += bucket.getNodes().size();
+        }
+        return nodeCount;
+    }
+
+    public void setBuckets(List<Bucket> buckets) {
+        this.buckets = buckets;
+    }
+
+    public List<Bucket> getBuckets() {
+        return buckets;
+    }
 }

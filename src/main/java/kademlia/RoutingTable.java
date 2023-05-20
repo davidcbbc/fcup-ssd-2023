@@ -50,6 +50,7 @@ public class RoutingTable implements Serializable {
         return Math.max(index, 0);
     }
 
+
     /**
      * Gets the correct bucket index by xoring BigInteger ids
      * @param targetId BigInteger id of the node

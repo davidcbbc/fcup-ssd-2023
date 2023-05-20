@@ -14,7 +14,7 @@ public class Block implements Serializable {
     private String previousBlockHash;
     private String hash;
     private int nonce;
-    private User validator;
+
 
     public Block(List<Transaction> transactions, long timestamp, String previousBlockHash) {
         this.transactions = transactions;
@@ -32,15 +32,6 @@ public class Block implements Serializable {
         this.previousBlockHash = previousBlockHash;
         this.nonce = gen_nounce;;
         this.hash = gen_hash;
-    }
-    public Block(List<Transaction> transactions, long timestamp, String previousBlockHash, User validator) {
-        this.transactions = transactions;
-        //System.out.println("CriaBloco2:" + this.toString() + " com este numero de transactions:" + this.transactions.size());
-        this.timestamp = timestamp;
-        this.previousBlockHash = previousBlockHash;
-        this.nonce = new Random().nextInt(Integer.MAX_VALUE);;
-        this.hash = calculateHash();
-        this.validator = validator;
     }
 
 

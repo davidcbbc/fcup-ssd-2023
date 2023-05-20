@@ -1,3 +1,5 @@
+import AuctionMechanism.TransactionTypes.Transaction;
+import AuctionMechanism.util.Item;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import kademlia.KademliaNode;
@@ -40,10 +42,23 @@ public class Main {
         //System.out.println(kademliaNode1.getRoutingTable().getNodeCount());
         kademliaNode4.joinNetwork("localhost",8080,kademliaNode1.getId(),kademliaNode1.getWallet().getPublicKey());
 
-        System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
+        //System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
         Thread.sleep(3000);
-        System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
-        System.out.println(kademliaNode4.getRoutingTable());
+        //System.out.println(kademliaNode4.getRoutingTable().getNodeCount());
+        //System.out.println(kademliaNode4.getRoutingTable());
+
+        Item item1 = new Item("it1", "it1_desc");
+        Transaction tr1 = new Transaction(kademliaNode1.getWallet().getPublicKey(), item1);
+        tr1.setSignature(kademliaNode1.getWallet().signTransaction(tr1.getHash()));
+
+        kademliaNode1.commitTransaction(tr1); // broadcast trans
+        Thread.sleep(2000);
+
+        kademliaNode2.mineBlock();
+
+
+        System.out.println("node3 number of blocks -> " + kademliaNode3.getBlockchain().getChain().size());
+
 
 
 

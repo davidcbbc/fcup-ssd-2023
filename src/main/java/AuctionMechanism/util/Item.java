@@ -1,6 +1,7 @@
 package AuctionMechanism.util;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Item implements Serializable {
     private static int idCounter = 0; // This counter will increment with each new Item
@@ -36,6 +37,21 @@ public class Item implements Serializable {
 
     public void setId(int id){
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return id == item.id &&
+                Objects.equals(Name, item.Name) &&
+                Objects.equals(Description, item.Description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Name, Description, id);
     }
 
     @Override

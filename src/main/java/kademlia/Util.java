@@ -1,5 +1,7 @@
 package kademlia;
 
+import AuctionMechanism.Wallet.Wallet;
+
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;

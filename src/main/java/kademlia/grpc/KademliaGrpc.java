@@ -139,8 +139,29 @@ public class KademliaGrpc extends KademliaServiceGrpc.KademliaServiceImplBase im
             } catch (Exception e) {
                 System.out.println("[-] Exception reading bytes from Block " + e.toString());
             }
-            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [ADDING BLOCK TO BLOCKCHAIN]");
+            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [ADDING BLOCK TO BLOCKCHAIN] COM ESTAS TRANSACTIONS:" + this.kademliaNode.getMempoolTransactions().size());
             this.kademliaNode.getBlockchain().addBlock(block);
+            System.out.println("[+] ["+this.kademliaNode.getPort()+"] [REMOVE MEMPOOL TRANSACTIONS DEPOIS DE ADICIONAR BLOCK], ANTES TINHA:" + this.kademliaNode.getMempoolTransactions().size());
+            this.kademliaNode.removeMempoolTransactions(block.getTransactions());
+            //this.kademliaNode.getMempoolTransactions().remove(0);
+            /*int j = 0;
+            block.printBlock();
+            for (Transaction tr : block.getTransactions()) {
+                {
+                    System.out.println("Transaction: ONDE DEVIA APAGAR:TRX:" + (j+1) + " com hash:" + tr.getHash());
+                    System.out.println("Transaction: ONDE DEVIA APAGAR:TRX:" + (j+1) + " com signature:" + tr.getSignature());
+                    System.out.println("Transaction: ONDE DEVIA APAGAR:TRX:" + (j+1) + " com item:" + tr.getAuctionedItem());
+                    System.out.println("Block: ONDE DEVIA APAGAR:TRX:" + j + " com hash:" + block.getTransactions().get(j).getHash());
+                    System.out.println("Block:ONDE DEVIA APAGAR:TRX:" + j + " com signature:" + block.getTransactions().get(j).getSignature());
+                    System.out.println("Block:ONDE DEVIA APAGAR:TRX:" + j + " com item:" + block.getTransactions().get(j).getAuctionedItem());
+                    j++;
+                }
+                this.kademliaNode.getMempoolTransactions().remove(tr);
+            }*/
+
+            System.out.println("[+] [" + this.kademliaNode.getPort() + "] Block Transactions size: " + block.getTransactions().size());
+            System.out.println("[+] [" + this.kademliaNode.getPort() + "] mempoolTransactions size: " + this.kademliaNode.getMempoolTransactions().size());
+
 
         }
 

@@ -130,7 +130,7 @@ public class NetworkNode {
 
         for (NetworkNode node : peers) {
             //System.out.println(this.toString() + " Node.broadcastBlock envia receive para o node " + node.toString());
-            node.receiveBlock(block);
+            node.receiveBlock(this,block);
         }
         //System.out.println(this.toString() + " Node.broadcastBlock limpa mempool transactions");
         mempoolTransactions.clear();
@@ -141,6 +141,8 @@ public class NetworkNode {
         return this.blockchain;
     }
 
+
+    /* Updated 21052023 Pedro
     public void receiveBlock(Block block) {
         // check if block is not already in the blockchain and if it's valid
         //System.out.println(this.toString() + " Node.receiveBlock para o block: " + block.toString() + " vai validar se block é valido e não está na chain");
@@ -174,6 +176,32 @@ public class NetworkNode {
             //PEDRO123
             //blockchain.getChain().remove(block);
             System.out.println(this.toString() + " Node.receiveBlock received invalid Block: " + block.toString());
+        }
+    }
+
+Updated 21052023 Pedro */
+    public void receiveBlock(NetworkNode senderNode, Block block) {
+        if (!blockchain.getChain().contains(block)) {
+            if (blockchain.isValidNewBlock(block, blockchain.getLastBlock())) {
+                blockchain.addBlock(block);
+                for (Transaction tr : block.getTransactions()) {
+                    mempoolTransactions.remove(tr);
+                }
+                broadcastBlock(block);
+            } else {
+                NetworkNode sender = senderNode;
+                List<Block> senderChain = sender.getBlockchain().getChain();
+                if (blockchain.isChainValid(senderChain) && senderChain.size() > blockchain.getChain().size()) {
+                    blockchain.replaceChain(senderChain);
+                    broadcastBlockchain();
+                    for (Transaction tr : mempoolTransactions) {
+                        if (mempoolTransactions.contains(tr)) {
+                            mempoolTransactions.remove(tr);
+                        }
+                    }
+
+                }
+            }
         }
     }
 
@@ -214,8 +242,8 @@ public class NetworkNode {
     public void addNode(NetworkNode node) {
         if (!isNodeConnected(node)) {
             peers.add(node);
-            node.addNode(this); // Establish the reciprocal connection
             broadcastNewNode(node);
+            node.addNode(this); // Establish the reciprocal connection
         }
     }
 

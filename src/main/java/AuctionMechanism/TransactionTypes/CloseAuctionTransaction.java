@@ -2,11 +2,13 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.util.Arrays;
 
-public class CloseAuctionTransaction extends Transaction {
+public class CloseAuctionTransaction extends Transaction implements Serializable {
 
     PublicKey winnerPublicKey;
     float winningBid;
@@ -57,4 +59,20 @@ public class CloseAuctionTransaction extends Transaction {
     public float getWinningBid() {
         return winningBid;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == this){
+            return true;
+        }
+        if(!(o instanceof CloseAuctionTransaction)){
+            return false;
+        }
+        CloseAuctionTransaction t = (CloseAuctionTransaction) o;
+        if (Arrays.equals(this.getHash(),t.getHash()) && Arrays.equals(this.getSignature(),t.getSignature()) && this.getAuctionedItem().equals(t.getAuctionedItem()) && this.getSellerPublicKey().equals(t.getSellerPublicKey()) && this.winnerPublicKey.equals(t.winnerPublicKey) && this.winningBid == t.winningBid) {
+            return true;
+        }
+        return false;
+    }
 }
+

@@ -15,7 +15,7 @@ public class TestTransactionFunctions {
         System.out.println(wallet.getPublicKey() + "\n" + wallet.getPrivateKey());
         Wallet fake_wallet = new Wallet();
         Item item = new Item("item1", "description1");
-        BidAuctionTransaction transaction = new BidAuctionTransaction(wallet.getPublicKey(),fake_wallet.getPublicKey(), item,10,null);
+        BidAuctionTransaction transaction = new BidAuctionTransaction(wallet.getPublicKey(),fake_wallet.getPublicKey(), item,10);
 
         byte[] signature = fake_wallet.signTransaction(transaction.getHash());
 

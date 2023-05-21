@@ -2,17 +2,19 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.util.Arrays;
 
-public class BidAuctionTransaction extends Transaction{
+public class BidAuctionTransaction extends Transaction implements Serializable {
 
     private float bidAmount;
     private PublicKey buyerPublicKey;
 
-    public BidAuctionTransaction(PublicKey sellerPublicKey, PublicKey buyerPublicKey, Item auctionedItem, float bidAmount, byte[] signature){
+    public BidAuctionTransaction(PublicKey sellerPublicKey, PublicKey buyerPublicKey, Item auctionedItem, float bidAmount){
         super(sellerPublicKey,auctionedItem);
         this.buyerPublicKey = buyerPublicKey;
         this.bidAmount = bidAmount;
@@ -76,6 +78,21 @@ public class BidAuctionTransaction extends Transaction{
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+        if(!(o instanceof BidAuctionTransaction)){
+            return false;
+        }
+        BidAuctionTransaction t = (BidAuctionTransaction) o;
+        if (Arrays.equals(this.getHash(),t.getHash()) && Arrays.equals(this.getSignature(),t.getSignature()) && t.getAuctionedItem().equals(this.getAuctionedItem()) && t.getBidAmount() == this.getBidAmount() && t.getBuyerPublicKey().equals(this.getBuyerPublicKey()) && t.getSellerPublicKey().equals(this.getSellerPublicKey())){
+            return true;
+        }
+        return false;
     }
 }
 

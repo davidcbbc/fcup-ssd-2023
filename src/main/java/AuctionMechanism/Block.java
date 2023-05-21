@@ -61,12 +61,16 @@ public class Block implements Serializable {
         System.out.println("main.Blockchain.main.Blockchain.Block:Timestamp: " + this.timestamp);
         System.out.println("main.Blockchain.main.Blockchain.Block:PreviousBlockHash " + this.previousBlockHash);
         System.out.println("main.Blockchain.main.Blockchain.Block:Hash " + this.hash);
-        //System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
-        //for(Transaction transaction : this.transactions)
-        //{
-            //transaction.printTransaction();
-        //}
-        //System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
+        System.out.println("main.Blockchain.main.Blockchain.Block:Transactions: ");
+        int i =1;
+        for(Transaction transaction : this.transactions)
+        {
+            System.out.println("TRX:" + i + " com hash:" + transaction.getHash());
+            System.out.println("TRX:" + i + " com signature:" + transaction.getSignature());
+            System.out.println("TRX:" + i + " com item:" + transaction.getAuctionedItem());
+            i++;
+        }
+        System.out.println("main.Blockchain.main.Blockchain.Block:FIM_Transactions: ");
         System.out.println("FIM_Block: " + this.toString());
     }
 
@@ -87,6 +91,10 @@ public class Block implements Serializable {
 
     public String calculateHash() {
         String data = previousBlockHash + Long.toString(timestamp) + Integer.toString(nonce) + transactionsToString();
+        String hashb = previousBlockHash;
+        Long timestampb = timestamp;
+        Integer nonceb = nonce;
+        List<Transaction> transactionsb = transactions;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(data.getBytes());
@@ -107,10 +115,12 @@ public class Block implements Serializable {
     }
 
     private String transactionsToString() {
-        StringBuilder sb = new StringBuilder();
-        for (Transaction tx : transactions) {
-            sb.append(tx.getHash());
+        String sb = "";
+        for (Transaction transaction : this.transactions) {
+
+            sb = sb.concat(new String(transaction.getHash()));
         }
-        return sb.toString();
+        //System.out.println("transactionsToString:" + sb);
+        return sb;
     }
 }

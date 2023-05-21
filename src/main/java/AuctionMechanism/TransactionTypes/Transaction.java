@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Transaction implements Serializable {
 
@@ -89,6 +90,26 @@ public class Transaction implements Serializable {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Transaction transaction = (Transaction) o;
+        return Objects.equals(sellerPublicKey, transaction.sellerPublicKey) &&
+                Objects.equals(auctionedItem, transaction.auctionedItem) &&
+                Objects.equals(hash, transaction.hash);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sellerPublicKey, auctionedItem, hash);
     }
 }
 

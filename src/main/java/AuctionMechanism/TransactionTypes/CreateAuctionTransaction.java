@@ -2,13 +2,14 @@ package AuctionMechanism.TransactionTypes;
 
 import AuctionMechanism.util.Item;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.util.Arrays;
 
-public class CreateAuctionTransaction extends Transaction {
+public class CreateAuctionTransaction extends Transaction implements Serializable {
 
 
     private float minimumBid;
@@ -54,6 +55,18 @@ public class CreateAuctionTransaction extends Transaction {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof CreateAuctionTransaction))
+            return false;
+        CreateAuctionTransaction t = (CreateAuctionTransaction) o;
+        if (Arrays.equals(this.getHash(),t.getHash()) && Arrays.equals(this.getSignature(),t.getSignature()) && this.getSellerPublicKey().equals(t.getSellerPublicKey()) && this.getAuctionedItem().equals(t.getAuctionedItem()) && this.minimumBid == t.minimumBid) {
+            return true;
+        }
+        return false;
     }
 
 }

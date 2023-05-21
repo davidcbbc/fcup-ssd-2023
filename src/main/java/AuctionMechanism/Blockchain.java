@@ -111,7 +111,7 @@ public class Blockchain implements Serializable {
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e vai fazer addBlock após o mineBlock: " + block.toString());
-            addBlock(block);
+            //addBlock(block);
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoS e faz return do bloco: " + block.toString());
             return block;
         } else if (!useProofOfStake) {
@@ -125,7 +125,7 @@ public class Blockchain implements Serializable {
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer mineBlock do Bloco criado: " + block.toString());
             block.mineBlock(this.difficulty);
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e vai fazer addBlock após o mineBlock: " + block.toString());
-            addBlock(block);
+            //addBlock(block);
             //System.out.println(this.toString() + " Blockchain.mineBlock usa PoW e faz return do bloco: " + block.toString());
             return block;
         }
@@ -161,21 +161,24 @@ public class Blockchain implements Serializable {
     public boolean isValidNewBlock(Block newBlock, Block previousBlock) {
         // Check that the block's previous hash matches the hash of the last block
         if (!newBlock.getPreviousBlockHash().equals(previousBlock.getHash())) {
-            //System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
+            System.out.println(" isValidNewBlock: newBlock.getPreviousBlockHash: " + newBlock.getPreviousBlockHash() + " previousBlockHash:" + previousBlock.getHash() );
             return false;
         }
-
+        System.out.println(this + " PAssou pelo menos uma vez no ValidBlock" );
         // Check that the block's hash is correct
         String hash = newBlock.calculateHash();
+        String hash2 = newBlock.calculateHash();
+        String hash3 = newBlock.calculateHash();
+        newBlock.printBlock();
         if (!hash.equals(newBlock.getHash())) {
-            //System.out.println(" isValidNewBlock: hash: " + hash + " newBlockHash:" + newBlock.getHash() );
+            System.out.println(this + " isValidNewBlock: hash: " + hash + " newBlockHash:" + newBlock.getHash() );
             return false;
         }
 
         // Check that the block's hash satisfies the difficulty requirement
         String target = new String(new char[difficulty]).replace('\0', '0');
         if (!hash.substring(0, difficulty).equals(target)) {
-            //System.out.println(" isValidNewBlock: a ultima validação"  );
+            System.out.println(" isValidNewBlock: a ultima validação"  );
             return false;
         }
         // PEDRO123 Verify the transactions in the block
@@ -211,7 +214,9 @@ public class Blockchain implements Serializable {
     public boolean replaceChain(List<Block> newChain) {
         if (isChainLengthValid(newChain) && isChainValid(newChain)) {
             this.chain = newChain;
-            //this.pendingTransactions = new ArrayList<Transaction>();
+            //if (useProofOfStake) {
+            //    this.validators = newValidators;
+            //}
             return true;
         } else {
             return false;

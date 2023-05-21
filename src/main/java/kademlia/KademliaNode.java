@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
 
 public class KademliaNode implements Serializable{
@@ -280,6 +281,9 @@ public class KademliaNode implements Serializable{
 
             System.out.println("[+] [" + this.port + "] [BLOCK STORE SENT]");
 
+            String blockHash = block.calculateHash();
+            System.out.println("[+] [" + this.port + "] No STORE BroadcastinG block with HASH:" + blockHash);
+
 
         }
     }
@@ -320,6 +324,8 @@ public class KademliaNode implements Serializable{
         for (Bucket bucket : this.routingTable.getBuckets()) {
             for (KademliaNode kademliaNode : bucket.getNodes()) {
                 System.out.println("[+] [" + this.port + "] Sending block to node " + kademliaNode.getPort());
+                String blockHash = block.calculateHash();
+                System.out.println("[+] [" + this.port + "] No BroadcastBLOCK Broadcasting block with HASH:" + blockHash);
                 this.store(kademliaNode, "BLOCK",null ,block);
             }
 
@@ -339,7 +345,11 @@ public class KademliaNode implements Serializable{
             if (block != null) {
                 System.out.println("[+] [" + this.port + "] Adding mined block to local blockchain");
                 this.blockchain.addBlock(block);
+                this.removeMempoolTransactions(block.getTransactions());
+                System.out.println("[+] [" + this.port + "] mempoolTransactions size: " + this.mempoolTransactions.size());
                 System.out.println("[+] [" + this.port + "] Broadcasting block");
+                String blockHash = block.calculateHash();
+                System.out.println("[+] [" + this.port + "] No MINE.BLOCK Broadcasting block with HASH:" + blockHash);
                 this.broadcastBlock(block);
             }
         } else {
@@ -348,6 +358,74 @@ public class KademliaNode implements Serializable{
 
     }
 
+    public void removeMempoolTransactions(List<Transaction> transactions){
+        Iterator<Transaction> iterator = this.mempoolTransactions.iterator();
+        while (iterator.hasNext()) {
+            Transaction mempoolTransaction = iterator.next();
+            for (Transaction transaction : transactions) {
+                if (transaction instanceof CreateAuctionTransaction && mempoolTransaction instanceof CreateAuctionTransaction) {
+                    CreateAuctionTransaction createAuctionTransaction = (CreateAuctionTransaction) transaction;
+                    CreateAuctionTransaction mempoolCreateAuctionTransaction = (CreateAuctionTransaction) mempoolTransaction;
+                    if (createAuctionTransaction.equals(mempoolCreateAuctionTransaction)) {
+                        System.out.println("[+] [" + this.port + "] Removing transaction from mempool" + createAuctionTransaction.toString());
+                        iterator.remove();
+                        break;
+                    }
+                } else if (transaction instanceof BidAuctionTransaction && mempoolTransaction instanceof BidAuctionTransaction) {
+                    BidAuctionTransaction bidAuctionTransaction = (BidAuctionTransaction) transaction;
+                    BidAuctionTransaction mempoolBidAuctionTransaction = (BidAuctionTransaction) mempoolTransaction;
+                    if (bidAuctionTransaction.equals(mempoolBidAuctionTransaction)) {
+                        System.out.println("[+] [" + this.port + "] Removing transaction from mempool" + bidAuctionTransaction.toString());
+                        iterator.remove();
+                        break;
+                    }
+                } else if (transaction instanceof CloseAuctionTransaction && mempoolTransaction instanceof CloseAuctionTransaction) {
+                    CloseAuctionTransaction closeAuctionTransaction = (CloseAuctionTransaction) transaction;
+                    CloseAuctionTransaction mempoolCloseAuctionTransaction = (CloseAuctionTransaction) mempoolTransaction;
+                    if (closeAuctionTransaction.equals(mempoolCloseAuctionTransaction)) {
+                        System.out.println("[+] [" + this.port + "] Removing transaction from mempool" + closeAuctionTransaction.toString());
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+
+        /*List<Transaction> finalMempoolTransactions = this.mempoolTransactions;
+        for (Transaction transaction: transactions){
+            for (Transaction mempoolTransaction: this.mempoolTransactions){
+
+                if (transaction instanceof CreateAuctionTransaction){
+                    if (mempoolTransaction instanceof CreateAuctionTransaction){
+                        CreateAuctionTransaction createAuctionTransaction = (CreateAuctionTransaction) transaction;
+                        CreateAuctionTransaction mempoolCreateAuctionTransaction = (CreateAuctionTransaction) mempoolTransaction;
+                        if (createAuctionTransaction.equals(mempoolCreateAuctionTransaction)){
+                            finalMempoolTransactions.remove(mempoolCreateAuctionTransaction);
+                        }
+                    }
+                }
+                if (transaction instanceof BidAuctionTransaction){
+                    if (mempoolTransaction instanceof BidAuctionTransaction){
+                        BidAuctionTransaction bidAuctionTransaction = (BidAuctionTransaction) transaction;
+                        BidAuctionTransaction mempoolBidAuctionTransaction = (BidAuctionTransaction) mempoolTransaction;
+                        if (bidAuctionTransaction.equals(mempoolBidAuctionTransaction)){
+                            finalMempoolTransactions.remove(mempoolBidAuctionTransaction);
+                        }
+                    }
+                }
+                if (transaction instanceof CloseAuctionTransaction){
+                    if (mempoolTransaction instanceof CloseAuctionTransaction){
+                        CloseAuctionTransaction closeAuctionTransaction = (CloseAuctionTransaction) transaction;
+                        CloseAuctionTransaction mempoolCloseAuctionTransaction = (CloseAuctionTransaction) mempoolTransaction;
+                        if (closeAuctionTransaction.equals(mempoolCloseAuctionTransaction)){
+                            finalMempoolTransactions.remove(mempoolCloseAuctionTransaction);
+                        }
+                    }
+                }
+            }
+        }
+        this.mempoolTransactions = finalMempoolTransactions;*/
+    }
 
     /**
      * Requests a blockchain copy from a KademliaNode
@@ -454,6 +532,43 @@ public class KademliaNode implements Serializable{
     }
 
     /**
+     * Check if the auction is open
+     * @return Open Auction Items
+     */
+    public List<Transaction> getOpenAuctions() {
+        List<Transaction> openAuctions = new ArrayList<>();
+        List<Transaction> allTransactions = this.getAllTransactions();
+
+        for (Transaction tr : allTransactions) {
+            if (tr instanceof CreateAuctionTransaction) {
+                openAuctions.add(tr);
+            } else if (tr instanceof CloseAuctionTransaction) {
+                for (Iterator<Transaction> iterator = openAuctions.iterator(); iterator.hasNext();) {
+                    Transaction transaction = iterator.next();
+                    if (transaction instanceof CreateAuctionTransaction && transaction.getAuctionedItem().getId() == tr.getAuctionedItem().getId()) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        return openAuctions;
+    }
+
+    public List<Item> getWinningAuctions(){
+        List<Item> items = new ArrayList<>();
+        for (Transaction tr : this.getAllTransactions()) {
+            if (tr instanceof CloseAuctionTransaction) {
+                CloseAuctionTransaction closeTransaction = (CloseAuctionTransaction) tr;
+                if ( closeTransaction.getWinnerPublicKey().equals(this.wallet.getPublicKey()) ) {
+                    items.add(closeTransaction.getAuctionedItem());
+                }
+            }
+        }
+        return items;
+    }
+
+    /**
      * Check if the user has valid balance
      * @param publicKey Public Key of the user
      * @return If the user has balance or not
@@ -492,18 +607,17 @@ public class KademliaNode implements Serializable{
      */
     public boolean checkAuctionOpen(Item auctionedItem) {
         boolean flag = false;
-
         List<Transaction> allTransactions = this.getAllTransactions();
         for (Transaction tr : allTransactions) {
             if (tr instanceof CreateAuctionTransaction) {
                 CreateAuctionTransaction createTr = (CreateAuctionTransaction) tr;
-                if (createTr.getAuctionedItem().equals(auctionedItem)) {
+                if (createTr.getAuctionedItem().getId() == auctionedItem.getId()) {
                     flag = true;
                 }
             }
             if (tr instanceof CloseAuctionTransaction) {
                 CloseAuctionTransaction closeTr = (CloseAuctionTransaction) tr;
-                if (closeTr.getAuctionedItem().equals(auctionedItem)) {
+                if (closeTr.getAuctionedItem().getId() == auctionedItem.getId()) {
                     flag = false;
                 }
             }
